@@ -6,13 +6,13 @@
   <meta name="description" content="Memory game with a Delft theme.">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!-- <link rel="stylesheet" type="text/css" href="./css/style.css"> -->
+  <link rel="stylesheet" type="text/css" href="./stylesheets/style.css">
 </head>
 <body>
   <main>
-    <img src = "images/brainlogo.png" width=100% />
+    <img src = "images/brainlogo.png" width=100px />
     <h1>Memorio</h1>
-    <h2>A quick memory brain that improves your brain</h2>
+    <h2>A quick memory game that improves your brain</h2>
 
 
     <form action="" method="">
@@ -30,55 +30,8 @@
       00:03
     </div> 
     <div id="game-board">
-      <div class="grid-container">
-        <div class="grid-item">
-           <img src="images/tegeltje-3.png" width="100%" />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-8.png" width="100%"/>
-       </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-40.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-50.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-72.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-40.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-50.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-72.png" width="100%"  />
-        </div>
-        <div class="grid-item">
-          <img src="images/tegeltje-3.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-8.png" width="100%" />
-      </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-40.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-50.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-72.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-40.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-50.png" width="100%"  />
-       </div>
-       <div class="grid-item">
-         <img src="images/tegeltje-72.png" width="100%"  />
-       </div>
+      <div id = "card-grid" class="grid-container">
+        
       </div>
     </div>
     <div id="your-score">
@@ -91,5 +44,10 @@
       Personal best: 2
     </div>
   </main>
+
+  <script src="javascripts/cardGrid.js"></script>
+
+  <script src="javascripts/interactions.js"></script>
+
 </body>
 </html>
