@@ -50,6 +50,9 @@ wss.on("connection", function connection(ws) {
    */
   const con = ws;
   con["id"] = connectionID++;
+  if(currentGame.hasTwoConnectedPlayers()){
+    currentGame = new Game(gameStatus.gamesInitialized);
+  }
   const playerType = currentGame.addPlayer(con);
   websockets[con["id"]] = currentGame;
 
@@ -63,21 +66,6 @@ wss.on("connection", function connection(ws) {
   con.send(playerType == "A" ? messages.S_PLAYER_A : messages.S_PLAYER_B);
 
   /*
-   * once we have two players, there is no way back;
-   * a new game object is created;
-   * if a player now leaves, the game is aborted (player is not preplaced)
-   */
-  if (currentGame.hasTwoConnectedPlayers()) {
-    console.log("starting game...")
-    let msg = messages.O_INIT_GAME;
-    msg.data = cardData;
-    currentGame.playerA.send(JSON.stringify(msg));
-    currentGame.playerB.send(JSON.stringify(msg));
-    currentGame = new Game(gameStatus.gamesInitialized++);
-
-  }
-
-  /*
    * message coming in from a player:
    *  1. determine the game object
    *  2. determine the opposing player OP
@@ -86,6 +74,38 @@ wss.on("connection", function connection(ws) {
   con.on("message", function incoming(message) {
     console.log("message incoming...");
     console.log(message.toString());
+    currentGame = websockets[con["id"]];
+    if(message.toString() == messages.T_PLAYER_A_READY){
+      console.log(`Player A of Game ${currentGame.id} is ready`);
+      currentGame.readyA = true;
+      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
+        /*
+         * once we have two players and they are ready, there is no way back;
+         * a new game object is created;
+         * if a player now leaves, the game is aborted (player is not preplaced)
+         */
+          console.log("starting game...")
+          let msg = messages.O_INIT_GAME;
+          msg.data = cardData;
+          currentGame.playerA.send(JSON.stringify(msg));
+          currentGame.playerB.send(JSON.stringify(msg));
+      }
+    } else if(message.toString() == messages.T_PLAYER_B_READY){
+      console.log(`Player B of Game ${currentGame.id} is ready`);
+      currentGame.readyB = true;
+      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
+        /*
+         * once we have two players and they are ready, there is no way back;
+         * a new game object is created;
+         * if a player now leaves, the game is aborted (player is not preplaced)
+         */
+          console.log("starting game...")
+          let msg = messages.O_INIT_GAME;
+          msg.data = cardData;
+          currentGame.playerA.send(JSON.stringify(msg));
+          currentGame.playerB.send(JSON.stringify(msg));
+      }
+    }
 
   });
 
@@ -113,6 +133,7 @@ wss.on("connection", function connection(ws) {
         try {
           gameObj.playerA.close();
           gameObj.playerA = null;
+          gameObj.readyA = false;
         } catch (e) {
           console.log("Player A closing: " + e);
         }
@@ -120,6 +141,7 @@ wss.on("connection", function connection(ws) {
         try {
           gameObj.playerB.close();
           gameObj.playerB = null;
+          gameObj.readyB = false;
         } catch (e) {
           console.log("Player B closing: " + e);
         }

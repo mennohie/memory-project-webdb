@@ -10,6 +10,24 @@
   };
 
   /*
+   * Client to server: player A is ready
+   */
+  exports.T_PLAYER_A_READY = "PLAYER-A-READY";
+  exports.O_PLAYER_A_READY = {
+    type: exports.T_PLAYER_A_READY,
+    data: null,
+  };
+
+  /*
+   * Client to server: player B is ready
+   */
+  exports.T_PLAYER_B_READY = "PLAYER-B-READY";
+  exports.O_PLAYER_B_READY = {
+    type: exports.T_PLAYER_B_READY,
+    data: null,
+  };
+
+  /*
    * Server to client: abort game (e.g. if second player exited the game)
    */
    exports.T_GAME_ABORTED = "GAME-ABORTED"
