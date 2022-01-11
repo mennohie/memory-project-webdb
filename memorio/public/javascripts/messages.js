@@ -93,15 +93,6 @@
   };
 
   /*
-   * Server to Player A | B: Which card has been turned around
-   */
-  exports.T_CARD_TURNED = "CARD-TURNED"
-  exports.O_CARD_TURNED = {
-    type: exports.T_CARD_TURNED,
-    data: null
-  };
-
-  /*
    * Server to Player A & B: Generated memory board
    */
   exports.T_MEMORY_BOARD = "MEMORY-BOARD"

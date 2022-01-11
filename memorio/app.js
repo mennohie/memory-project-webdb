@@ -78,6 +78,10 @@ wss.on("connection", function connection(ws) {
     if(message.toString() == messages.T_PLAYER_A_READY){
       console.log(`Player A of Game ${currentGame.id} is ready`);
       currentGame.readyA = true;
+      let msg = messages.O_PLAYER_A_READY;
+      msg.data = "true";
+      currentGame.playerA.send(JSON.stringify(msg))
+      currentGame.playerB.send(JSON.stringify(msg))
       if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
@@ -93,6 +97,10 @@ wss.on("connection", function connection(ws) {
     } else if(message.toString() == messages.T_PLAYER_B_READY){
       console.log(`Player B of Game ${currentGame.id} is ready`);
       currentGame.readyB = true;
+      let msg = messages.O_PLAYER_B_READY;
+      msg.data = "true";
+      currentGame.playerA.send(JSON.stringify(msg))
+      currentGame.playerB.send(JSON.stringify(msg))
       if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
