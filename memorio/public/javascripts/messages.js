@@ -38,6 +38,15 @@
   exports.S_PLAYER_B = JSON.stringify(exports.O_PLAYER_B);
 
   /*
+  * Server to clients: Initializing gameID
+  */
+  exports.T_INIT_GAME = "INIT_GAME"
+  exports.O_INIT_GAME = {
+  type: exports.T_INIT_GAME,
+  data: null,
+  };
+
+  /*
    * Server to client: Timer has run out
    */
   exports.T_TIMER_RUN_OUT = "TIMER-RUN-OUT"
