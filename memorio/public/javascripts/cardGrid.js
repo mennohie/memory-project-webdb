@@ -16,11 +16,11 @@ function Card(id, image, text, matchId) {
     this.isTurned = false;
 
     this.element = document.createElement('div');
-    this.element.id = `card-${id}`;
+    this.element.id = id;
 
-    this.element.onclick = function() {
-        this.turnOver();
-    }.bind(this)
+    // this.element.onclick = function() {
+    //     this.turnOver();
+    // }.bind(this)
 
     this.imgElement = document.createElement('img');
     this.imgElement.setAttribute('width', '100%');
@@ -36,7 +36,6 @@ function Card(id, image, text, matchId) {
                 this.element.classList.remove(ROTATE_CLASS_NAME)
                 this.imgElement.src = BACKFACE_IMAGE;
             }
-
         }
         this.isTurned = !this.isTurned
         return this.matchId;
@@ -55,6 +54,11 @@ function Card(id, image, text, matchId) {
         return this.element
     }
 
+    this.getId = function() {
+        return this.id;
+    }
+
+
 }
 
 function createCards(cardData) {
@@ -70,12 +74,10 @@ function createCards(cardData) {
 
 function cardGrid(cards) {
     this.cards = cards
-
     this.cardGridElement = document.getElementById('card-grid')
-
     this.toMatchId = null;
-
     this.turnedCards = []
+    this.isActivePlayer = false;
 
     this.cards.forEach(element => {
         this.cardGridElement.appendChild(
@@ -83,8 +85,30 @@ function cardGrid(cards) {
         );
     });
 
-    this.cardGridElement.onclick = function() {
-        this.getTurnedCards();
+    this.setActivePlayer = function (isActive) {
+        this.isActivePlayer = isActive;
+    }
+
+    this.reset = function() {
+        this.cards.forEach(element => {
+            if(!element.isMatched && element.isTurned) {
+                element.turnOver();
+            }
+        });
+    }
+
+    this.cardGridElement.onclick = function(e) {
+        if (this.isActivePlayer) {
+            cardId = e.target.parentElement.id
+            this.cards.every(element => {
+                if(element.getId() === cardId) {
+                    element.turnOver();
+                    return false;
+                }
+                return true;
+            });
+            this.getTurnedCards();
+        }
     }.bind(this)
 
 

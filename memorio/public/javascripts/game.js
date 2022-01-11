@@ -1,51 +1,62 @@
-// @ts-check
 
 
 
 
-function Game(id, cardGrid, playerA, playerB) {
+function Game(id, socket) {
     this.id = id;
     this.winner = null;
 
-    this.playerA = playerA;
-    this.playerB = playerB;
+    this.playerType = null;
     this.turns = [];
 
-    this.cardGrid = this.cardGrid;
 
-    this.playing = null;
-    this.timer = null;
+    this.currentPlayer = null 
+    this.timer = new Timer(2);
+
   
+    this.setCardGrid = function (cardGrid) {
+        this.cardGrid = cardGrid;
+    }
+
+    this.setPlayerA = function (player) {
+        this.playerA = player;
+    }
+
+    this.setPlayerB = function (player) {
+        this.playerB = player;
+    }
+
     this.doTurn = function() {
-        
+
         // start timer with n secs
+        this.timer.start();
 
+        this.cardGrid.setActivePlayer(this.currentPlayer == playerA)
 
-        
-
-
-        // 
-
-        if(this.playing === playerA){
-            this.playing = playerB
+        if(this.currentPlayer == playerA){
+            this.currentPlayer = playerB
         }
-        if(this.playing === playerB){
-            this.playing = playerA
+        else if(this.currentPlayer == playerB){
+            this.currentPlayer = playerA
         }
-    };
+    };  
 
+    this.start = function () {
+        this.currentPlayer = playerA;
+        window.requestAnimationFrame(() => {this.loop();})
+    }
 
+    this.loop = function () {
+        this.cardGrid.reset();
+        let currentPlayerElement = document.getElementById('current-player')
+        currentPlayerElement.innerText = "current player: " + this.currentPlayer.name;
+        this.doTurn();
+        setTimeout(() => {
+              window.requestAnimationFrame(
+                () => {this.loop();}
+            );
+        }, 2000);
 
-
-
-    this.getID = function () {
-      return this.getID();
-    };
-    this.setID = function (id) {
-      this.id = id;
-    };
-
-    
-
+    }
 
   }
