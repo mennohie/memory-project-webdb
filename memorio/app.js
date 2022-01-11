@@ -74,12 +74,10 @@ wss.on("connection", function connection(ws) {
   con.on("message", function incoming(message) {
     console.log("message incoming...");
     console.log(message.toString());
-    console.log(currentGame.hasTwoConnectedPlayers());
-
+    currentGame = websockets[con["id"]];
     if(message.toString() == messages.T_PLAYER_A_READY){
-      console.log("Player A is ready");
+      console.log(`Player A of Game ${currentGame.id} is ready`);
       currentGame.readyA = true;
-      const gameObj = websockets[con["id"]];
       if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
@@ -89,13 +87,13 @@ wss.on("connection", function connection(ws) {
           console.log("starting game...")
           let msg = messages.O_INIT_GAME;
           msg.data = cardData;
-          gameObj.playerA.send(JSON.stringify(msg));
-          gameObj.playerB.send(JSON.stringify(msg));
+          currentGame.playerA.send(JSON.stringify(msg));
+          currentGame.playerB.send(JSON.stringify(msg));
       }
     } else if(message.toString() == messages.T_PLAYER_B_READY){
-      console.log("Player B is ready");
-      gameObj.readyB = true;
-      if(gameObj.readyA && gameObj.readyB && gameObj.hasTwoConnectedPlayers()){
+      console.log(`Player B of Game ${currentGame.id} is ready`);
+      currentGame.readyB = true;
+      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
          * a new game object is created;
@@ -104,8 +102,8 @@ wss.on("connection", function connection(ws) {
           console.log("starting game...")
           let msg = messages.O_INIT_GAME;
           msg.data = cardData;
-          gameObj.playerA.send(JSON.stringify(msg));
-          gameObj.playerB.send(JSON.stringify(msg));
+          currentGame.playerA.send(JSON.stringify(msg));
+          currentGame.playerB.send(JSON.stringify(msg));
       }
     }
 
