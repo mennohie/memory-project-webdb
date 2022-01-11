@@ -8,7 +8,6 @@ const port = process.argv[2];
 const app = express();
 const gameStatus = require("./gameStatus");
 const Game = require("./game");
-const game = require("./game");
 
 if (process.argv.length < 3) {
   console.log("Usage: node app.js <port>");
