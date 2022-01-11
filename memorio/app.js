@@ -50,6 +50,9 @@ wss.on("connection", function connection(ws) {
    */
   const con = ws;
   con["id"] = connectionID++;
+  if(currentGame.hasTwoConnectedPlayers()){
+    currentGame = new Game(gameStatus.gamesInitialized);
+  }
   const playerType = currentGame.addPlayer(con);
   websockets[con["id"]] = currentGame;
 
@@ -71,10 +74,12 @@ wss.on("connection", function connection(ws) {
   con.on("message", function incoming(message) {
     console.log("message incoming...");
     console.log(message.toString());
+    console.log(currentGame.hasTwoConnectedPlayers());
 
     if(message.toString() == messages.T_PLAYER_A_READY){
       console.log("Player A is ready");
       currentGame.readyA = true;
+      const gameObj = websockets[con["id"]];
       if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
@@ -84,14 +89,13 @@ wss.on("connection", function connection(ws) {
           console.log("starting game...")
           let msg = messages.O_INIT_GAME;
           msg.data = cardData;
-          currentGame.playerA.send(JSON.stringify(msg));
-          currentGame.playerB.send(JSON.stringify(msg));
-          currentGame = new Game(gameStatus.gamesInitialized++);
+          gameObj.playerA.send(JSON.stringify(msg));
+          gameObj.playerB.send(JSON.stringify(msg));
       }
     } else if(message.toString() == messages.T_PLAYER_B_READY){
       console.log("Player B is ready");
-      currentGame.readyB = true;
-      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
+      gameObj.readyB = true;
+      if(gameObj.readyA && gameObj.readyB && gameObj.hasTwoConnectedPlayers()){
         /*
          * once we have two players and they are ready, there is no way back;
          * a new game object is created;
@@ -100,9 +104,8 @@ wss.on("connection", function connection(ws) {
           console.log("starting game...")
           let msg = messages.O_INIT_GAME;
           msg.data = cardData;
-          currentGame.playerA.send(JSON.stringify(msg));
-          currentGame.playerB.send(JSON.stringify(msg));
-          currentGame = new Game(gameStatus.gamesInitialized++);
+          gameObj.playerA.send(JSON.stringify(msg));
+          gameObj.playerB.send(JSON.stringify(msg));
       }
     }
 
