@@ -9,11 +9,14 @@ function Game(id, socket) {
     this.playerType = null;
     this.turns = [];
 
+    this.readyA = false;
+    this.readyB = false;
 
-    this.currentPlayer = null 
+
+    this.currentPlayer = null
     this.timer = new Timer(2);
 
-  
+
     this.setCardGrid = function (cardGrid) {
         this.cardGrid = cardGrid;
     }
@@ -39,7 +42,7 @@ function Game(id, socket) {
         else if(this.currentPlayer == playerB){
             this.currentPlayer = playerA
         }
-    };  
+    };
 
     this.start = function () {
         this.currentPlayer = playerA;
@@ -50,6 +53,12 @@ function Game(id, socket) {
         this.cardGrid.reset();
         let currentPlayerElement = document.getElementById('current-player')
         currentPlayerElement.innerText = "current player: " + this.currentPlayer.name;
+        if(this.readyA){
+          document.getElementById('ready-a').innerHTML = "Player A is ready!";
+        }
+        if(this.readyB){
+          document.getElementById('ready-b').innerHTML = "Player B is ready!";
+        }
         this.doTurn();
         setTimeout(() => {
               window.requestAnimationFrame(
