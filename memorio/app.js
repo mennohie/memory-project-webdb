@@ -86,7 +86,7 @@ wss.on("connection", function connection(ws) {
   con.on("message", function incoming(message) {
     console.log("message incoming...");
     console.log(message.toString());
- 
+
   });
 
   con.on("close", function(code) {
@@ -128,3 +128,16 @@ wss.on("connection", function connection(ws) {
   });
 });
 server.listen(port);
+
+app.get("/", function(req, res){
+  res.sendFile("splash.html", {root: "./public"});
+});
+
+app.get("/play", function(req, res){
+  res.sendFile("game.html", {root: "./public"});
+});
+
+// Default if route is not known
+app.get("/*", function(req, res){
+  res.send("404 not found.")
+});
