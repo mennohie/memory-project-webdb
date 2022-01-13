@@ -38,15 +38,6 @@
   exports.S_PLAYER_B = JSON.stringify(exports.O_PLAYER_B);
 
   /*
-  * Server to clients: Initializing gameID
-  */
-  exports.T_INIT_GAME = "INIT_GAME"
-  exports.O_INIT_GAME = {
-  type: exports.T_INIT_GAME,
-  data: null,
-  };
-
-  /*
    * Server to client: Timer has run out
    */
   exports.T_TIMER_RUN_OUT = "TIMER-RUN-OUT"
@@ -66,16 +57,7 @@
   };
 
   /*
-   * Server to Player A | B: Which card has been turned around
-   */
-  exports.T_CARD_TURNED = "CARD-TURNED"
-  exports.O_CARD_TURNED = {
-    type: exports.T_CARD_TURNED,
-    data: null
-  };
-
-  /*
-   * Server to Player A | B: Which card has been turned around
+   * Player A | B to Server: Which card has been turned around
    */
   exports.T_CARD_TURNED = "CARD-TURNED"
   exports.O_CARD_TURNED = {
@@ -91,6 +73,17 @@
     type: exports.T_MEMORY_BOARD,
     data: null
   };
+
+
+  /*
+   *
+   */
+  exports.T_GAME_STATE = "GAME-STATE"
+  exports.O_GAME_STATE = {
+    type: exports.T_GAME_STATE,
+    data: null
+  }
+
 
 
 

@@ -1,18 +1,22 @@
 
 
-
+const gameState = function (gameID) {
+    this.id = gameID;
+    this.timeElapsed = 0;
+    this.turns = [];
+    this.currentPlayer = null;
+    this.playerA = null;
+    this.playerB = null;
+    this.cardGrid = null;
+}
 
 function Game(id, socket) {
     this.id = id;
     this.winner = null;
-
     this.playerType = null;
     this.turns = [];
-
-
     this.currentPlayer = null 
     this.timer = new Timer(2);
-
   
     this.setCardGrid = function (cardGrid) {
         this.cardGrid = cardGrid;
@@ -56,7 +60,12 @@ function Game(id, socket) {
                 () => {this.loop();}
             );
         }, 2000);
-
     }
+
+    this.refreshGameState = function (gameState) {
+        
+    }
+
+
 
   }

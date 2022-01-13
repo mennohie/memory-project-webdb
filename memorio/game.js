@@ -11,6 +11,7 @@ const game = function(gameID) {
     this.playerB = null;
     this.id = gameID;
     this.gameState = "0 PLAYERS"; //"A" means A won, "B" means B won, "ABORTED" means the game was aborted
+    this.time = 0;
 };
 
 
@@ -131,6 +132,25 @@ game.prototype.addPlayer = function(p) {
         return "B";
     }
 };
+
+
+/**
+ * 
+ */
+game.prototype.doTurn = function(p) {
+    if (this.gameState != "IN-GAME") {
+        return new Error(
+            `Invalid call to doTurn, current state is ${this.gameState}`
+        );
+    }  
+};
+
+game.prototype.start = function(p) {
+
+}
   
+
+
+
 
 module.exports = game;

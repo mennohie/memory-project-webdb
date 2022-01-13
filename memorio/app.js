@@ -68,13 +68,12 @@ wss.on("connection", function connection(ws) {
    * if a player now leaves, the game is aborted (player is not preplaced)
    */
   if (currentGame.hasTwoConnectedPlayers()) {
-    console.log("starting game...")
-    let msg = messages.O_INIT_GAME;
+    console.log("2 players are ready...")
+    let msg = messages.O_MEMORY_BOARD;
     msg.data = cardData;
     currentGame.playerA.send(JSON.stringify(msg));
     currentGame.playerB.send(JSON.stringify(msg));
     currentGame = new Game(gameStatus.gamesInitialized++);
-
   }
 
   /*
@@ -84,8 +83,17 @@ wss.on("connection", function connection(ws) {
    *  3. send the message to OP
    */
   con.on("message", function incoming(message) {
-    console.log("message incoming...");
-    console.log(message.toString());
+          
+    // recognize which game is refered to.
+    const gameObj = websockets[con["id"]];
+
+    if(message.toString() != 'undefined') {
+        JSON.stringify(message.toString());
+          
+    }
+
+
+    
 
   });
 
