@@ -9,6 +9,8 @@ const websocket = require("ws");
 const game = function(gameID) {
     this.playerA = null;
     this.playerB = null;
+    this.readyA = false;
+    this.readyB = false;
     this.id = gameID;
     this.gameState = "0 PLAYERS"; //"A" means A won, "B" means B won, "ABORTED" means the game was aborted
     this.time = 0;
@@ -18,7 +20,7 @@ const game = function(gameID) {
 /*
  * All valid transition states are keys of the transitionStates object.
  */
-game.prototype.transitionStates = { 
+game.prototype.transitionStates = {
     "0 PLAYERS": 0,
     "1 PLAYERS": 1,
     "2 PLAYERS": 2,
@@ -58,16 +60,16 @@ game.prototype.isValidTransition = function(from, to) {
     } else {
         i = game.prototype.transitionStates[from];
     }
-  
+
     if (!(to in game.prototype.transitionStates)) {
         return false;
     } else {
         j = game.prototype.transitionStates[to];
     }
-  
+
     return game.prototype.transitionMatrix[i][j] > 0;
 };
-  
+
   /**
    * Determines whether the state `s` is valid.
    * @param {string} s state to check
@@ -118,12 +120,12 @@ game.prototype.addPlayer = function(p) {
             `Invalid call to addPlayer, current state is ${this.gameState}`
         );
     }
-  
+
     const error = this.setStatus("1 PLAYERS");
     if (error instanceof Error) {
         this.setStatus("2 PLAYERS");
     }
-  
+
     if (this.playerA == null) {
         this.playerA = p;
         return "A";
