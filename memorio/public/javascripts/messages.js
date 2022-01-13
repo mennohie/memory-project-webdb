@@ -10,27 +10,19 @@
   };
 
   /*
-   * Client to server: player A is ready
+   * Client to server: player A | B is ready
    */
-  exports.T_PLAYER_A_READY = "PLAYER-A-READY";
-  exports.O_PLAYER_A_READY = {
-    type: exports.T_PLAYER_A_READY,
+  exports.T_PLAYER_READY = "PLAYER-READY";
+  exports.O_PLAYER_READY = {
+    type: exports.T_PLAYER_READY,
     data: null,
   };
 
-  /*
-   * Client to server: player B is ready
-   */
-  exports.T_PLAYER_B_READY = "PLAYER-B-READY";
-  exports.O_PLAYER_B_READY = {
-    type: exports.T_PLAYER_B_READY,
-    data: null,
-  };
 
   /*
    * Server to client: abort game (e.g. if second player exited the game)
    */
-   exports.T_GAME_ABORTED = "GAME-ABORTED"
+  exports.T_GAME_ABORTED = "GAME-ABORTED"
   exports.O_GAME_ABORTED = {
     type: exports.T_GAME_ABORTED,
   };
@@ -40,20 +32,25 @@
    * Server to client: set as player A
    */
   exports.T_PLAYER_TYPE = "PLAYER-TYPE";
-  exports.O_PLAYER_A = {
+  exports.O_PLAYER_TYPE = {
     type: exports.T_PLAYER_TYPE,
-    data: "A",
+    data: null,
   };
-  exports.S_PLAYER_A = JSON.stringify(exports.O_PLAYER_A);
+  exports.S_PLAYER_A = JSON.stringify({
+    type: exports.T_PLAYER_TYPE,
+    data: "A"
+  })
+  exports.S_PLAYER_B = JSON.stringify({
+    type: exports.T_PLAYER_TYPE,
+    data: "B"
+  })
 
-  /*
-   * Server to client: set as player B
-   */
-  exports.O_PLAYER_B = {
-    type: exports.T_PLAYER_TYPE,
-    data: "B",
-  };
-  exports.S_PLAYER_B = JSON.stringify(exports.O_PLAYER_B);
+
+  exports.T_PLAYER_TURN = "PLAYER-TURN"
+  exports.O_PLAYER_TURN = {
+    type: exports.T_PLAYER_TURN,
+    data: null
+  }
 
   /*
    * Server to client: Timer has run out
@@ -63,7 +60,6 @@
     type: exports.T_TIMER_RUN_OUT,
     data: null,
   };
-  exports.S_PLAYER_B = JSON.stringify(exports.O_PLAYER_B);
 
   /*
    * Server to Player A & B: game over with result won/loss
@@ -80,7 +76,7 @@
   exports.T_CARD_TURNED = "CARD-TURNED"
   exports.O_CARD_TURNED = {
     type: exports.T_CARD_TURNED,
-    data: null
+    data: null // card id
   };
 
   /*
@@ -99,6 +95,12 @@
   exports.T_GAME_STATE = "GAME-STATE"
   exports.O_GAME_STATE = {
     type: exports.T_GAME_STATE,
+    data: null
+  }
+
+  exports.T_CARD_MATCH = "CARD-MATCH"
+  exports.O_CARD_MATCH = {
+    type: exports.T_CARD_MATCH,
     data: null
   }
 

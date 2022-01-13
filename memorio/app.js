@@ -6,7 +6,7 @@ const websocket = require("ws");
 const messages = require("./public/javascripts/messages");
 const port = process.argv[2];
 const app = express();
-const gameStatus = require("./gameStatus");
+const gameStatus = require("./gameStats");
 const Game = require("./game");
 
 if (process.argv.length < 3) {
@@ -44,6 +44,7 @@ const cardData = [
 ];
 
 
+
 wss.on("connection", function connection(ws) {
   /*
    * two-player game: every two players are added to the same game
@@ -59,76 +60,38 @@ wss.on("connection", function connection(ws) {
   console.log(
     `Player ${con["id"]} placed in game ${currentGame.id} as ${playerType}`
   );
-
-  /*
-   * inform the client about its assigned player type
-   */
+  
   con.send(playerType == "A" ? messages.S_PLAYER_A : messages.S_PLAYER_B);
 
   /*
-<<<<<<< HEAD
-   * once we have two players, there is no way back;
-   * a new game object is created;
-   * if a player now leaves, the game is aborted (player is not preplaced)
-   */
-  if (currentGame.hasTwoConnectedPlayers()) {
-    console.log("2 players are ready...")
-    let msg = messages.O_MEMORY_BOARD;
-    msg.data = cardData;
-    currentGame.playerA.send(JSON.stringify(msg));
-    currentGame.playerB.send(JSON.stringify(msg));
-    currentGame = new Game(gameStatus.gamesInitialized++);
-  }
-
-  /*
-=======
->>>>>>> 20752c82e64271bc5942847e4065f032615d9db1
    * message coming in from a player:
    *  1. determine the game object
    *  2. determine the opposing player OP
    *  3. send the message to OP
    */
   con.on("message", function incoming(message) {
-    console.log("message incoming...");
-    console.log(message.toString());
     currentGame = websockets[con["id"]];
-    if(message.toString() == messages.T_PLAYER_A_READY){
-      console.log(`Player A of Game ${currentGame.id} is ready`);
-      currentGame.readyA = true;
-      let msg = messages.O_PLAYER_A_READY;
-      msg.data = "true";
-      currentGame.playerA.send(JSON.stringify(msg))
-      currentGame.playerB.send(JSON.stringify(msg))
-      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
-        /*
-         * once we have two players and they are ready, there is no way back;
-         * a new game object is created;
-         * if a player now leaves, the game is aborted (player is not preplaced)
-         */
-          console.log("starting game...")
-          let msg = messages.O_MEMORY_BOARD;
-          msg.data = cardData;
-          currentGame.playerA.send(JSON.stringify(msg));
-          currentGame.playerB.send(JSON.stringify(msg));
+    console.log(currentGame.gameState);
+
+    if (message.toString() != undefined) {
+      console.log(message.toString())
+      
+      if(currentGame.gameState == "2 PLAYERS") {
+        const obj = JSON.parse(message.toString());
+        console.log(obj)
+        if(obj.type == messages.T_PLAYER_READY){
+          currentGame.readyPlayer(obj.data)
+          if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
+            currentGame.start(cardData)
+          }
+        }
       }
-    } else if(message.toString() == messages.T_PLAYER_B_READY){
-      console.log(`Player B of Game ${currentGame.id} is ready`);
-      currentGame.readyB = true;
-      let msg = messages.O_PLAYER_B_READY;
-      msg.data = "true";
-      currentGame.playerA.send(JSON.stringify(msg))
-      currentGame.playerB.send(JSON.stringify(msg))
-      if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
-        /*
-         * once we have two players and they are ready, there is no way back;
-         * a new game object is created;
-         * if a player now leaves, the game is aborted (player is not preplaced)
-         */
-          console.log("starting game...")
-          let msg = messages.O_MEMORY_BOARD;
-          msg.data = cardData;
-          currentGame.playerA.send(JSON.stringify(msg));
-          currentGame.playerB.send(JSON.stringify(msg));
+      else if(currentGame.gameState == "IN-GAME") {
+        console.log(`incoming game message at ${currentGame.id} `)
+        const obj = JSON.parse(message.toString());
+        if(obj.type == messages.T_CARD_TURNED) {
+          console.log(obj.data)
+        }
       }
     }
 
@@ -145,10 +108,10 @@ wss.on("connection", function connection(ws) {
       /*
        * if possible, abort the game; if not, the game is already completed
        */
-      const gameObj = websockets[con["id"]];
+      const currentGame = websockets[con["id"]];
 
-      if (gameObj.isValidTransition(gameObj.gameState, "ABORTED")) {
-        gameObj.setStatus("ABORTED");
+      if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
+        currentGame.setStatus("ABORTED");
         gameStatus.gamesAborted++;
 
         /*
@@ -156,17 +119,17 @@ wss.on("connection", function connection(ws) {
          * close it
          */
         try {
-          gameObj.playerA.close();
-          gameObj.playerA = null;
-          gameObj.readyA = false;
+          currentGame.playerA.close();
+          currentGame.playerA = null;
+          currentGame.readyA = false;
         } catch (e) {
           console.log("Player A closing: " + e);
         }
 
         try {
-          gameObj.playerB.close();
-          gameObj.playerB = null;
-          gameObj.readyB = false;
+          currentGame.playerB.close();
+          currentGame.playerB = null;
+          currentGame.readyB = false;
         } catch (e) {
           console.log("Player B closing: " + e);
         }

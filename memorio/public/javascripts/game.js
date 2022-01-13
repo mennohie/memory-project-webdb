@@ -1,12 +1,14 @@
 
 
-const gameState = function (gameID) {
+const GameState = function (gameID) {
     this.id = gameID;
     this.timeElapsed = 0;
     this.turns = [];
     this.currentPlayer = null;
     this.playerA = null;
     this.playerB = null;
+    this.readyA = false;
+    this.readyB = false;
     this.cardGrid = null;
 }
 
@@ -15,9 +17,6 @@ function Game(id, socket) {
     this.winner = null;
     this.playerType = null;
     this.turns = [];
-
-    this.readyA = false;
-    this.readyB = false;
 
 
     this.currentPlayer = null
@@ -58,8 +57,6 @@ function Game(id, socket) {
 
     this.loop = function () {
         this.cardGrid.reset();
-        let currentPlayerElement = document.getElementById('current-player')
-        currentPlayerElement.innerText = "current player: " + this.currentPlayer.name;
         if(this.readyA){
           document.getElementById('ready-a').innerHTML = "Player A is ready!";
         }

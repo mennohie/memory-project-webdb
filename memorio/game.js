@@ -1,6 +1,8 @@
 //@ts-check
 
 const websocket = require("ws");
+const messages = require("./public/javascripts/messages");
+
 
 /**
  * Game constructor. Every game has two players, identified by their WebSocket.
@@ -11,9 +13,12 @@ const game = function(gameID) {
     this.playerB = null;
     this.readyA = false;
     this.readyB = false;
+    this.currentPlayer = null;
     this.id = gameID;
     this.gameState = "0 PLAYERS"; //"A" means A won, "B" means B won, "ABORTED" means the game was aborted
     this.time = 0;
+    this.turns = [];
+    this.cardGrid = null;
 };
 
 
@@ -135,24 +140,167 @@ game.prototype.addPlayer = function(p) {
     }
 };
 
+game.prototype.readyPlayer = function(pString) {
+    if (this.gameState != "2 PLAYERS") {
+        return new Error(
+            `Invalid call to readyPlayer, current state is ${this.gameState}`
+        );
+    }  
+
+    if (pString != "A" && pString != "B") {
+        return new Error(
+            `Invalid call to readyPlayer supplied pString is ${pString}`
+        );
+    }
+
+    console.log(`Player ${pString} of Game ${this.id} is ready`);
+
+    if (pString == "A"){
+        this.readyA = true;
+    }
+    else if (pString == "B") {
+        this.readyB = true;
+    }
+
+    let msg = messages.O_PLAYER_READY;
+    msg.data = pString
+    this.playerA.send(JSON.stringify(msg))
+    this.playerB.send(JSON.stringify(msg))
+
+    
+
+}
+
 
 /**
  * 
  */
-game.prototype.doTurn = function(p) {
+game.prototype.doTurn = function() {
     if (this.gameState != "IN-GAME") {
         return new Error(
             `Invalid call to doTurn, current state is ${this.gameState}`
         );
-    }  
+    }
+    console.log(`turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
+    let turnMsg = messages.O_PLAYER_TURN;
+    turnMsg.data = this.turns.length;
+    this.currentPlayer.send(JSON.stringify(turnMsg))
+
+
+    setTimeout(() =>{ 
+        console.log(`end of turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
+
+        let endTurnMsg = messages.O_TIMER_RUN_OUT;
+        endTurnMsg.data = 0;
+        this.currentPlayer.send(JSON.stringify(endTurnMsg))
+        this.currentPlayer = this.currentPlayer == this.playerA ? this.playerB : this.playerA;
+        this.doTurn()
+    
+    }, 2000);
+
+
 };
 
-game.prototype.start = function(p) {
 
+
+
+game.prototype.start = function(cardData) {
+    /*
+    * once we have two players and they are ready, there is no way back;
+    * a new game object is created;
+    * if a player now leaves, the game is aborted (player is not preplaced)
+    */
+    if (this.gameState != "2 PLAYERS") {
+        return new Error(
+            `Invalid call to start, current state is ${this.gameState}`
+        );
+    }  
+    console.log(`starting game ${this.id}...`)
+
+    this.cardGrid = new CardGrid(cardData);
+
+    let msg = messages.O_MEMORY_BOARD;
+    msg.data = cardData;
+    this.playerA.send(JSON.stringify(msg));
+    this.playerB.send(JSON.stringify(msg));
+
+    this.setStatus("PRE-GAME") // TODO: maybe add a count down timer 3... 2... 1... GO!
+    this.setStatus("IN-GAME")
+    this.currentPlayer = this.playerA;
+    this.doTurn();
 }
   
 
 
+const Card = function(id, image, text, matchId) {
+    this.id = id;
+    this.matchId = matchId;
+    this.text = text;
+    this.image = image;
+    this.isMatched = false;
+    this.isTurned = false;
+}
 
+Card.prototype.getClientCard = function() {
+    return {"id": this.id}
+}
+
+function createCards(cardData) {
+    let cards = [];
+    cardData.forEach(card => {
+        cards.push(
+            new Card(card.id, card.image, card.text, card.matchId)
+        );
+    });
+    return cards;
+}
+
+const CardGrid = function(cardData) {
+    this.cards = createCards(cardData)
+    this.turnedCards = []
+}
+
+CardGrid.prototype.turnCard = function(cardId) {
+
+    this.cards.every(card => {
+        if(card.getId() === cardId) {
+            card.isTurned = true;
+            this.turnedCards.push(card)
+            return false;
+        }
+        return true;
+    });
+
+    if (this.checkTurnedCards.length === 2) {
+        this.checkTurnedCards()
+    }
+}
+
+CardGrid.prototype.checkTurnedCards = function() {
+    if (this.checkTurnedCards.length !== 2) {
+        return new Error(`length of turnedCards must be 2, the current length is ${this.checkTurnedCards.length}`)
+    }
+    if (!this.turnedCards[0].isMatched && !this.turnedCards[1].isMatched) {
+        const isMatch = this.turnedCards[0].matchId === this.turnedCards[1].matchId;
+        if (isMatch) {
+            this.turnedCards[0].isMatched = true;
+            this.turnedCards[0].isTurned = false;
+            this.turnedCards[1].isMatched = true;
+            this.turnedCards[1].isTurned = false;
+            return true
+        }
+        else {
+            this.turnedCards[0].isTurned = false;
+            this.turnedCards[1].isTurned = false;
+            this.turnedCards = [];
+            return false
+        }
+    }
+
+}
+
+CardGrid.prototype.getTurnedCards = function() {
+    return this.getTurnedCards
+}
 
 module.exports = game;
