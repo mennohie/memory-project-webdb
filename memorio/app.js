@@ -60,9 +60,9 @@ wss.on("connection", function connection(ws) {
   console.log(
     `Player ${con["id"]} placed in game ${currentGame.id} as ${playerType}`
   );
-  
+
   con.send(playerType == "A" ? messages.S_PLAYER_A : messages.S_PLAYER_B);
-  
+
   if(currentGame.gameState == "2 PLAYERS") {
     currentGame.playerA.send(messages.S_FOUND_GAME)
     currentGame.playerB.send(messages.S_FOUND_GAME)
@@ -80,7 +80,7 @@ wss.on("connection", function connection(ws) {
 
     if (message.toString() != undefined) {
       console.log(message.toString())
-      
+
       if(currentGame.gameState == "2 PLAYERS") {
         const obj = JSON.parse(message.toString());
         console.log(obj)
@@ -126,17 +126,17 @@ wss.on("connection", function connection(ws) {
       currentGame.removePlayer(con)
 
     }
-    
+
   });
 });
 server.listen(port);
 
 app.get("/", function(req, res){
-  res.sendFile("splash.html", {root: "./public"});
+  res.sendFile("splash.html", {root: "./memorio/public"});
 });
 
 app.get("/play", function(req, res){
-  res.sendFile("game.html", {root: "./public"});
+  res.sendFile("game.html", {root: "./memorio/public"});
 });
 
 // Default if route is not known
