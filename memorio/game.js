@@ -241,8 +241,6 @@ Game.prototype.turnCard = function(cardId) {
     // turn the actual card server side
     this.cardGrid.turnCard(cardId);
 
-    // console.log(this.cardGrid.turnedCards)
-
     // send the turned cards to the current player
     let msg = messages.O_TURNED_CARDS;
     msg.data = {"turnedCards" : null, "newCard": null}
@@ -286,6 +284,21 @@ Game.prototype.turnCard = function(cardId) {
 }
 
 
+Game.prototype.addScore = function() {
+    let msg = messages.O_ADD_SCORE;
+
+    if(this.currentPlayer == this.playerA) {
+        this.scoreA += 10;
+        msg.data = {player: "A", addScore: 10, currentScore: this.scoreA}
+    }
+    else if(this.currentPlayer == this.playerB) {
+        this.scoreB += 10;
+        msg.data = {player: "B", addScore: 10, currentScore: this.scoreB}
+    }
+
+    this.playerA.send(JSON.stringify(msg))
+    this.playerB.send(JSON.stringify(msg))
+}
 
 
 Game.prototype.start = function(cardData) {

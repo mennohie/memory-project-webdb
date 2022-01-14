@@ -85,19 +85,19 @@
     data: null // [card id, ...]
   }
 
-  exports.T_BOARD_STATE = "BOARD-STATE"
-  exports.O_BOARD_STATE = {
+  exports.T_ADD_SCORE = "ADD-SCORE"
+  exports.O_ADD_SCORE = {
     type: exports.T_BOARD_STATE,
-    data: null // gameState
+    data: null // to who (A/B) and how much.
   }
 
-  exports.T_BAD_MOVE = "BAD_MOVE"
+  exports.T_BAD_MOVE = "BAD-MOVE"
   exports.O_BAD_MOVE = {
     type: exports.T_BAD_MOVE
   }
   exports.S_BAD_MOVE = JSON.stringify(exports.O_BAD_MOVE)
 
-  exports.T_END_TURN = "END_TURN"
+  exports.T_END_TURN = "END-TURN"
   exports.O_END_TURN = {
     type: exports.T_END_TURN
   }
