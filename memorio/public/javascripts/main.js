@@ -105,7 +105,7 @@
           else if (incomingMsg.data.player == "B") {
             game.scoreB = incomingMsg.data.currentScore
             if (game.playerType == "B") {
-              document.getElementById("you-score").innerHTML = `${incomingMsg.data.currentScore}`;
+              document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
             }
             else if (game.playerType == "A") {
               document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
@@ -115,7 +115,12 @@
         }
 
         if (incomingMsg.type == Messages.T_GAME_WON_BY) {
-          document.getElementById('game-board').innerHTML = `GAME WON BY: ${incomingMsg.data}`
+          overlapCss = document.getElementById('server-info');
+          overlapCss.hidden = false;
+          overlapCss.style.border = "3px solid green";
+
+          document.getElementById('server-info').innerHTML = `Game won by: ${incomingMsg.data}. Congratulations!`
+
           // game.timer.stop();
         }
 
