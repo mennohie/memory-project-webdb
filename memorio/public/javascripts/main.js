@@ -11,8 +11,6 @@
     socket.onmessage = function (event) {
         let incomingMsg = JSON.parse(event.data);
 
-        console.log(incomingMsg);
-
         // set game data
         if (incomingMsg.type == Messages.T_MEMORY_BOARD) {
             console.log(incomingMsg.data);
@@ -33,6 +31,7 @@
             }
         }
 
+
         if (incomingMsg.type == Messages.T_PLAYER_READY){
           console.log(incomingMsg + ` Player ${incomingMsg.data}$ Is Ready`)
           if (incomingMsg.data == "A") {
@@ -44,7 +43,6 @@
             document.getElementById("ready-b").innerHTML = `Player B is ready`;
           }
         }
-
 
         if (incomingMsg.type == Messages.T_TURNED_CARDS) {
           console.log(cardGrid.cards)
@@ -94,6 +92,11 @@
             document.getElementById("score-b").innerHTML = `score B is ${incomingMsg.data.currentScore}`;
           }
 
+        }
+
+        if (incomingMsg.type == Messages.T_GAME_WON_BY) {
+          document.getElementById('game-board').innerHTML = `GAME WON BY: ${incomingMsg.data}`
+          // game.timer.stop();
         }
     };
 

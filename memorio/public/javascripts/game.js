@@ -19,7 +19,6 @@ function Game(id, socket) {
     this.scoreB = 0;
     
 
-
     this.currentPlayer = null
 
 

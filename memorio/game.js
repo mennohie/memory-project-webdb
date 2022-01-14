@@ -268,8 +268,10 @@ Game.prototype.turnCard = function(cardId) {
 
 
             this.cardGrid.resetTurned();
-
-
+            
+            if (this.checkForEnding()) {
+                this.end()
+            }
         }
         else {
             this.addScore(-1);
@@ -281,6 +283,50 @@ Game.prototype.turnCard = function(cardId) {
     }
 }
 
+
+Game.prototype.checkForEnding = function() {
+    let noMatchLeft = true;
+    this.cardGrid.cards.every(element => {
+        if (!element.isMatched) {
+            noMatchLeft = false;
+            return false;
+        }
+        return true;
+    });
+    return noMatchLeft;
+}
+
+Game.prototype.end = function() {
+    console.log("end game")
+
+    if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+        this.timeoutID = null
+        console.log("stop running timer at ending")
+    }
+
+    // stop turn of current player
+    this.currentPlayer.send(messages.S_END_TURN)
+    this.currentPlayer = null
+
+    let winMsg = messages.O_GAME_WON_BY
+
+    if (this.scoreA > this.scoreB) {
+        winMsg.data = "A"
+    }
+    else if (this.scoreA < this.scoreB){
+        winMsg.data = "B"
+    }
+    else if (this.scoreA === this.scoreB) {
+        winMsg.data = "TIE"
+    }
+
+    this.playerA.send(JSON.stringify(winMsg))
+    this.playerB.send(JSON.stringify(winMsg))
+
+    
+        
+}
 
 Game.prototype.addScore = function(score) {
     let msg = messages.O_ADD_SCORE;
