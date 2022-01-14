@@ -2,7 +2,7 @@
 (function setup() {
 
     // const socket = new WebSocket(Setup.WEB_SOCKET_URL);
-    const socket = new WebSocket("ws://localhost:3000");
+    const socket = new WebSocket("ws://" + window.location.host);
     game = new Game(0, socket);
 
     timer = new Timer(100);
@@ -135,7 +135,7 @@
     }
 
     socket.onopen = function () {
-        
+
     };
 
     //server sends a close event only if the game was aborted from some side
