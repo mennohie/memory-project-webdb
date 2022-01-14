@@ -36,6 +36,8 @@ a {
 }
 
 .game-board-panel {
+  float: left;
+  position: relative;
   grid-column: 2;
   grid-row: 2;
   height: 100%;
@@ -72,7 +74,7 @@ a {
 
 .footer-item {
   padding: 5px;
-  
+
 }
 
 .ready-button {
@@ -112,4 +114,12 @@ a {
 
 .rotate {
   background-color: rgb(255, 255, 255)
+}
+
+.server-info {
+  position: relative;
+  margin: auto;
+  width: 50%;
+  padding: 10px 10px 10px 10px;
+  background-color: white;
 }

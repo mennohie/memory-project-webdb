@@ -109,9 +109,6 @@ wss.on("connection", function connection(ws) {
     console.log(`${con["id"]} disconnected ...`);
 
     if (code == 1001) {
-
-      // TODO: add game.abort()
-
       /*
        * if possible, abort the game; if not, the game is already completed
        */
@@ -119,15 +116,13 @@ wss.on("connection", function connection(ws) {
 
       if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
         currentGame.setStatus("ABORTED");
-        console.log(`Game aborted.`);
+        console.log(`Game ${currentGame.id} aborted due to connection ${con["id"]} closing.`);
         gameStatus.gamesAborted++;
         currentGame.playerA.send(messages.S_GAME_ABORTED)
         currentGame.playerB.send(messages.S_GAME_ABORTED)
       }
 
-
       currentGame.removePlayer(con)
-
     }
 
   });
