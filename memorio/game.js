@@ -152,6 +152,14 @@ Game.prototype.addPlayer = function(p) {
     }
 };
 
+Game.prototype.removePlayer = function(p) {
+    if (this.playerA == p) {
+        this.playerA = null
+        this.setStatus("1 PLAYERS")
+    }    
+
+}
+
 Game.prototype.readyPlayer = function(pString) {
     if (this.gameState != "2 PLAYERS") {
         return new Error(

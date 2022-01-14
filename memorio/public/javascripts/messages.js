@@ -46,6 +46,13 @@
   })
 
 
+  exports.T_FOUND_GAME = "FOUND-GAME"
+  exports.O_FOUND_GAME = {
+    type: exports.T_FOUND_GAME,
+  }
+  exports.S_FOUND_GAME = JSON.stringify(exports.O_FOUND_GAME)
+
+
   exports.T_PLAYER_TURN = "PLAYER-TURN"
   exports.O_PLAYER_TURN = {
     type: exports.T_PLAYER_TURN,

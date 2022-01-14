@@ -13,12 +13,18 @@
     <div class="main-grid">
 
       <div class="left-main-grid-panel">
-        <img src = "images/brainlogo.png" width=100px />
-        <h1>Memorio</h1>
-        <h2>A quick memory game that improves your brain</h2>
-        <button id = "ready">Ready for new game!</button>
-        <div id="personal-best">
-          Personal best: 2
+        <div>
+          <img src = "images/brainlogo.png" width=100px />
+        </div>
+        <div>
+          <h1>Memorio</h1>
+          <h2>A quick memory game that improves your brain</h2>
+        </div>
+        <div>
+          <div id="finding">
+            Finding another player...
+          </div>
+          <div id = "ready" class="hidden">Ready?</div>
         </div>
       </div>
 
@@ -36,21 +42,33 @@
         </div>
       </div>
 
-      <div class="footer-main-grid-panel">
-        <div id= "player-type">
-        </div>
-        <div id="score-a">
-  
-        </div>
-        <div id="score-b">
-          
-        </div>
+      <div class="header-main-grid-panel">
         <div id= "player-turn">
+          Game not started...
         </div>
-        <div id = "ready-a">
+      </div>
+
+      <div class="footer-main-grid-panel">
+        <div class="score-board">
+          <h1> Your Score: </h1>
+          <h1 id="your-score">
+            0
+          </h1>
         </div>
-        <div id= "ready-b">
+        <div id = "ready-you">
+          Not in a game
         </div>
+        <div class="score-board">
+          <h1> Their Score: </h1>
+          <h1 id="other-score">
+            0
+          </h1>
+
+        </div>
+        <div id= "ready-other">
+          Not in a game
+        </div>
+
       </div>
 
 

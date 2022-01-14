@@ -27,20 +27,20 @@ let connectionID = 0; //each websocket receives a unique ID
 const cardData = [
   {id : 'card-0', image: 0, text: "bladiebla #1", matchId: 0},
   {id : 'card-1', image: 1, text: "bladiebla #2", matchId: 1},
-  // {id : 'card-2', image: 2, text: "bladiebla #3", matchId: 2},
-  // {id : 'card-3', image: 3, text: "bladiebla #4", matchId: 3},
-  // {id : 'card-4', image: 4, text: "bladiebla #5", matchId: 4},
-  // {id : 'card-5', image: 5, text: "bladiebla #6", matchId: 5},
-  // {id : 'card-6', image: 6, text: "bladiebla #7", matchId: 6},
-  // {id : 'card-7', image: 7, text: "bladiebla #8", matchId: 7},
+  {id : 'card-2', image: 2, text: "bladiebla #3", matchId: 2},
+  {id : 'card-3', image: 3, text: "bladiebla #4", matchId: 3},
+  {id : 'card-4', image: 4, text: "bladiebla #5", matchId: 4},
+  {id : 'card-5', image: 5, text: "bladiebla #6", matchId: 5},
+  {id : 'card-6', image: 6, text: "bladiebla #7", matchId: 6},
+  {id : 'card-7', image: 7, text: "bladiebla #8", matchId: 7},
   {id : 'card-8', image: 0, text: "bladiebla #1", matchId: 0},
   {id : 'card-9', image: 1, text: "bladiebla #2", matchId: 1},
-  // {id : 'card-10', image: 2, text: "bladiebla #3", matchId: 2},
-  // {id : 'card-11', image: 3, text: "bladiebla #4", matchId: 3},
-  // {id : 'card-12', image: 4, text: "bladiebla #5", matchId: 4},
-  // {id : 'card-13', image: 5, text: "bladiebla #6", matchId: 5},
-  // {id : 'card-14', image: 6, text: "bladiebla #7", matchId: 6},
-  // {id : 'card-15', image: 7, text: "bladiebla #8", matchId: 7},
+  {id : 'card-10', image: 2, text: "bladiebla #3", matchId: 2},
+  {id : 'card-11', image: 3, text: "bladiebla #4", matchId: 3},
+  {id : 'card-12', image: 4, text: "bladiebla #5", matchId: 4},
+  {id : 'card-13', image: 5, text: "bladiebla #6", matchId: 5},
+  {id : 'card-14', image: 6, text: "bladiebla #7", matchId: 6},
+  {id : 'card-15', image: 7, text: "bladiebla #8", matchId: 7},
 ];
 
 
@@ -62,6 +62,11 @@ wss.on("connection", function connection(ws) {
   );
   
   con.send(playerType == "A" ? messages.S_PLAYER_A : messages.S_PLAYER_B);
+  
+  if(currentGame.gameState == "2 PLAYERS") {
+    currentGame.playerA.send(messages.S_FOUND_GAME)
+    currentGame.playerB.send(messages.S_FOUND_GAME)
+  }
 
   /*
    * message coming in from a player:
@@ -71,7 +76,7 @@ wss.on("connection", function connection(ws) {
    */
   con.on("message", function incoming(message) {
     currentGame = websockets[con["id"]];
-    console.log(currentGame.gameState);
+
 
     if (message.toString() != undefined) {
       console.log(message.toString())
@@ -104,6 +109,9 @@ wss.on("connection", function connection(ws) {
     console.log(`${con["id"]} disconnected ...`);
 
     if (code == 1001) {
+
+      // TODO: add game.abort()
+
       /*
        * if possible, abort the game; if not, the game is already completed
        */
@@ -112,28 +120,13 @@ wss.on("connection", function connection(ws) {
       if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
         currentGame.setStatus("ABORTED");
         gameStatus.gamesAborted++;
-
-        /*
-         * determine whose connection remains open;
-         * close it
-         */
-        try {
-          currentGame.playerA.close();
-          currentGame.playerA = null;
-          currentGame.readyA = false;
-        } catch (e) {
-          console.log("Player A closing: " + e);
-        }
-
-        try {
-          currentGame.playerB.close();
-          currentGame.playerB = null;
-          currentGame.readyB = false;
-        } catch (e) {
-          console.log("Player B closing: " + e);
-        }
       }
+
+
+      currentGame.removePlayer(con)
+
     }
+    
   });
 });
 server.listen(port);

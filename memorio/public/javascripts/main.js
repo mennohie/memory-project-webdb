@@ -36,11 +36,21 @@
           console.log(incomingMsg + ` Player ${incomingMsg.data}$ Is Ready`)
           if (incomingMsg.data == "A") {
             game.readyA = true;
-            document.getElementById("ready-a").innerHTML = `Player A is ready`;
+            if (game.playerType == "A"){
+              document.getElementById("ready-you").innerHTML = `You are ready`;
+            }
+            else if (game.playerType == "B"){
+              document.getElementById("ready-other").innerHTML = `Other player ready`;
+            }
           }
           else if (incomingMsg.data == "B") {
             game.readyB = true;
-            document.getElementById("ready-b").innerHTML = `Player B is ready`;
+            if (game.playerType == "B"){
+              document.getElementById("ready-you").innerHTML = `You are ready`;
+            }
+            else if (game.playerType == "A"){
+              document.getElementById("ready-other").innerHTML = `Other player ready`;
+            }
           }
         }
 
@@ -85,11 +95,21 @@
           console.log(incomingMsg)
           if (incomingMsg.data.player == "A") {
             game.scoreA = incomingMsg.data.currentScore
-            document.getElementById("score-a").innerHTML = `score A is ${incomingMsg.data.currentScore}`;
+            if (game.playerType == "A") {
+              document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
+            }
+            else if (game.playerType == "B") {
+              document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
+            }
           }
           else if (incomingMsg.data.player == "B") {
             game.scoreB = incomingMsg.data.currentScore
-            document.getElementById("score-b").innerHTML = `score B is ${incomingMsg.data.currentScore}`;
+            if (game.playerType == "B") {
+              document.getElementById("you-score").innerHTML = `${incomingMsg.data.currentScore}`;
+            }
+            else if (game.playerType == "A") {
+              document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
+            }
           }
 
         }
@@ -97,6 +117,14 @@
         if (incomingMsg.type == Messages.T_GAME_WON_BY) {
           document.getElementById('game-board').innerHTML = `GAME WON BY: ${incomingMsg.data}`
           // game.timer.stop();
+        }
+
+        if (incomingMsg.type == Messages.T_FOUND_GAME) {
+          console.log(incomingMsg)
+          ready = document.getElementById("ready")
+          finding = document.getElementById("finding")
+          finding.classList.add("hidden")
+          ready.classList.remove("hidden")
         }
     };
 
