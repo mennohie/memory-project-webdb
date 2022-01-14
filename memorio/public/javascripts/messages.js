@@ -87,7 +87,7 @@
 
   exports.T_ADD_SCORE = "ADD-SCORE"
   exports.O_ADD_SCORE = {
-    type: exports.T_BOARD_STATE,
+    type: exports.T_ADD_SCORE,
     data: null // to who (A/B) and how much.
   }
 

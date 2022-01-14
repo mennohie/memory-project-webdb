@@ -15,7 +15,9 @@ function Game(id, socket) {
     this.winner = null;
     this.playerType = null;
     this.turns = [];
-    this.score = []
+    this.scoreA = 0;
+    this.scoreB = 0;
+    
 
 
     this.currentPlayer = null

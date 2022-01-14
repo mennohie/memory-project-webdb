@@ -45,10 +45,6 @@
           }
         }
 
-        if (incomingMsg.type == Messages.T_BOARD_STATE) {
-          console.log(incomingMsg + ` currentBoardState ${incomingMsg.data}`)
-          game.setBoardState(incomingMsg.data)
-        }
 
         if (incomingMsg.type == Messages.T_TURNED_CARDS) {
           console.log(cardGrid.cards)
@@ -85,6 +81,19 @@
 
         if (incomingMsg.type == Messages.T_CARD_MATCH) {
           game.cardGrid.matchCards(incomingMsg.data)
+        }
+
+        if (incomingMsg.type == Messages.T_ADD_SCORE) {
+          console.log(incomingMsg)
+          if (incomingMsg.data.player == "A") {
+            game.scoreA = incomingMsg.data.currentScore
+            document.getElementById("score-a").innerHTML = `score A is ${incomingMsg.data.currentScore}`;
+          }
+          else if (incomingMsg.data.player == "B") {
+            game.scoreB = incomingMsg.data.currentScore
+            document.getElementById("score-b").innerHTML = `score B is ${incomingMsg.data.currentScore}`;
+          }
+
         }
     };
 

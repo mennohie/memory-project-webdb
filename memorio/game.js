@@ -258,8 +258,7 @@ Game.prototype.turnCard = function(cardId) {
         // delay checking to see the second card longer.
         if (isMatch) {
             // add score
-            console.log("match")
-            // this.currentPlayer.addScore();
+            this.addScore(10);
 
             let msg = messages.O_CARD_MATCH
             msg.data = this.cardGrid.turnedCards
@@ -273,8 +272,7 @@ Game.prototype.turnCard = function(cardId) {
 
         }
         else {
-            console.log("bad move. other turn")
-            console.log(messages.S_BAD_MOVE)
+            this.addScore(-1);
             this.currentPlayer.send(messages.S_BAD_MOVE)
             this.swapTurn()
 
@@ -284,15 +282,15 @@ Game.prototype.turnCard = function(cardId) {
 }
 
 
-Game.prototype.addScore = function() {
+Game.prototype.addScore = function(score) {
     let msg = messages.O_ADD_SCORE;
 
     if(this.currentPlayer == this.playerA) {
-        this.scoreA += 10;
+        this.scoreA += score;
         msg.data = {player: "A", addScore: 10, currentScore: this.scoreA}
     }
     else if(this.currentPlayer == this.playerB) {
-        this.scoreB += 10;
+        this.scoreB += score;
         msg.data = {player: "B", addScore: 10, currentScore: this.scoreB}
     }
 
