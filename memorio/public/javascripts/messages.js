@@ -79,6 +79,30 @@
     data: null // card id
   };
 
+  exports.T_TURNED_CARDS = "TURNED-CARDS"
+  exports.O_TURNED_CARDS = {
+    type: exports.T_TURNED_CARDS,
+    data: null // [card id, ...]
+  }
+
+  exports.T_BOARD_STATE = "BOARD-STATE"
+  exports.O_BOARD_STATE = {
+    type: exports.T_BOARD_STATE,
+    data: null // gameState
+  }
+
+  exports.T_BAD_MOVE = "BAD_MOVE"
+  exports.O_BAD_MOVE = {
+    type: exports.T_BAD_MOVE
+  }
+  exports.S_BAD_MOVE = JSON.stringify(exports.O_BAD_MOVE)
+
+  exports.T_END_TURN = "END_TURN"
+  exports.O_END_TURN = {
+    type: exports.T_END_TURN
+  }
+  exports.S_END_TURN = JSON.stringify(exports.O_END_TURN)
+
   /*
    * Server to Player A & B: Generated memory board
    */
@@ -89,9 +113,6 @@
   };
 
 
-  /*
-   *
-   */
   exports.T_GAME_STATE = "GAME-STATE"
   exports.O_GAME_STATE = {
     type: exports.T_GAME_STATE,

@@ -11,6 +11,8 @@ function Card(id) {
     this.id = id;
     this.isMatched = false;
     this.isTurned = false;
+    this.text = null;
+    this.image = null;
 
     this.element = document.createElement('div');
     this.element.id = id;
@@ -20,20 +22,41 @@ function Card(id) {
     this.imgElement.src = BACKFACE_IMAGE;
 
     this.turnOver = function (image, text) {
-        if ( !this.isTurned ){
-            this.element.classList.add(ROTATE_CLASS_NAME)
-            this.imgElement.src = frontfaceImage(image);
-        }
-        else {
-            if(!this.isMatched) {
+        if (!this.isMatched) {
+            if ( !this.isTurned && image != null && text != null ){
+                // turn front
+                this.element.classList.add(ROTATE_CLASS_NAME)
+                this.imgElement.src = frontfaceImage(image);
+            }
+            else {
+                // turn back
                 this.element.classList.remove(ROTATE_CLASS_NAME)
                 this.imgElement.src = BACKFACE_IMAGE;
             }
+            this.isTurned = !this.isTurned
+            return this.isTurned;
         }
-        this.isTurned = !this.isTurned
-        return this.matchId;
+        else {
+            this.element.classList.add(ROTATE_CLASS_NAME)
+            this.imgElement.src = frontfaceImage(this.image);
+        }
+        return this.isMatched
     }
-    
+
+    this.reset = function () {
+        this.isTurned = false
+        if (this.isMatched) {
+            this.element.classList.add(ROTATE_CLASS_NAME)
+            this.imgElement.src = frontfaceImage(this.image);
+        }
+        else {
+            // turn back
+            this.element.classList.remove(ROTATE_CLASS_NAME)
+            this.imgElement.src = BACKFACE_IMAGE;
+        }
+    }
+
+   
    /* 
     * creates an element of form
     * 
@@ -77,9 +100,17 @@ function CardGrid(cards, socket) {
 
     this.reset = function() {
         this.cards.forEach(element => {
-            if(!element.isMatched && element.isTurned) {
-                element.turnOver();
+            element.reset();
+        });
+    }
+
+    this.turnOverCard = function(cardId, image, text) {
+        this.cards.every(element => {
+            if(element.id === cardId) {
+                element.turnOver(image, text);
+                return false;
             }
+            return true;
         });
     }
 
@@ -90,37 +121,50 @@ function CardGrid(cards, socket) {
             // find the card by id in the cards array and turn it over
             cardId = e.target.parentElement.id
             this.cards.every(element => {
-                if(element.getId() === cardId) {
+                if(element.id === cardId) {
 
-                    // find all turned cards
-            this.turnedCards = []
-            this.cards.forEach(element => {
-                if(element.isTurned) {
-                    this.turnedCards.push(element)
-                }
-            });
-
-            // send a message of the newly turned card and the previously listed turned cards
-            let msg = Messages.O_CARD_TURNED;
-            msg.data = {"cardId" : cardId, "turnedCards" : turnedCards}
-            socket.send(JSON.stringify(msg))
-
-
-
+                    let msg = Messages.O_CARD_TURNED;
+                    msg.data = {"cardId" : cardId}
+                    console.log(msg)
+                    socket.send(JSON.stringify(msg))
 
                     return false;
                 }
                 return true;
             });
-
-
-
         }
     }.bind(this)
 
+    this.setState = function(cards) {
+        cards.forEach(c => {
+            if (c.isMatched) {
+                this.cards.forEach(card => {
+                    if(card.id == c.id) {
+                        card.isMatched = c.isMatched
+                        card.text = c.text
+                        card.image = c.image
+                    }
+                })
+            }
+        })
+    }
 
-    // this.turnedCards.forEach(element => {
-    //     element.isMatched = true;
-    //     element.turnOver();
-    // })
+    this.matchCards = function(turnedCards) {
+        turnedCards.forEach(c => {
+            if (c.isMatched) {
+                this.cards.forEach(card => {
+                    if(card.id == c.id) {
+                        card.isMatched = c.isMatched
+                        card.text = c.text
+                        card.image = c.image
+                    }
+                })
+            }
+        })
+    }
+
+
+
+
+    
 }

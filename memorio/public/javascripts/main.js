@@ -1,13 +1,12 @@
-const game = require("../../game");
-
-
-
 //set everything up, including the WebSocket
 (function setup() {
 
     // const socket = new WebSocket(Setup.WEB_SOCKET_URL);
     const socket = new WebSocket("ws://localhost:3000");
     game = new Game(0, socket);
+
+    timer = new Timer(100);
+
 
     socket.onmessage = function (event) {
         let incomingMsg = JSON.parse(event.data);
@@ -21,14 +20,13 @@ const game = require("../../game");
             cards = createCards(incomingMsg.data);
             cardGrid = new CardGrid(cards, socket);
             game.setCardGrid(cardGrid)
-            game.start();
         }
 
         //set player type
         if (incomingMsg.type == Messages.T_PLAYER_TYPE) {
             console.log(incomingMsg)
             game.playerType = incomingMsg.data;
-            document.getElementById("current-player").innerHTML = "You are player: " + incomingMsg.data;
+            document.getElementById("player-type").innerHTML = "You are player: " + incomingMsg.data;
 
             if (incomingMsg.data === "A") {
                 console.log("you are the first player! (A)")
@@ -47,13 +45,46 @@ const game = require("../../game");
           }
         }
 
-        if (incomingMsg.type == Messages.T_PLAYER_TURN) {
-          document.getElementById("player-turn").innerHTML = "Your turn";
-          game.refreshGameState()
+        if (incomingMsg.type == Messages.T_BOARD_STATE) {
+          console.log(incomingMsg + ` currentBoardState ${incomingMsg.data}`)
+          game.setBoardState(incomingMsg.data)
         }
 
-        if (incomingMsg.type == Messages.T_TIMER_RUN_OUT) {
-          document.getElementById("player-turn").innerHTML = "other turn";
+        if (incomingMsg.type == Messages.T_TURNED_CARDS) {
+          console.log(cardGrid.cards)
+          console.log(incomingMsg.data)
+          const turnedCards = incomingMsg.data.turnedCards;
+          const newCard = incomingMsg.data.newCard;
+          game.cardGrid.turnOverCard(newCard.id,newCard.image, newCard.text)
+        }
+
+        if (incomingMsg.type == Messages.T_PLAYER_TURN) {
+          game.cardGrid.reset()
+
+          document.getElementById("player-turn").innerHTML = "Your turn";
+          game.cardGrid.setActivePlayer(true)
+
+          timer.set(5000)
+          timer.start();
+        }
+
+        if (incomingMsg.type == Messages.T_TIMER_RUN_OUT || incomingMsg.type == Messages.T_BAD_MOVE) {
+          console.log(incomingMsg)
+        }
+
+        if (incomingMsg.type == Messages.T_END_TURN) {
+          console.log(incomingMsg)
+          game.cardGrid.reset()
+
+          document.getElementById("player-turn").innerHTML = "Other Player turn";
+          game.cardGrid.setActivePlayer(false)
+          timer.stop()
+          timer.set(5000)
+          timer.start();
+        }
+
+        if (incomingMsg.type == Messages.T_CARD_MATCH) {
+          game.cardGrid.matchCards(incomingMsg.data)
         }
     };
 

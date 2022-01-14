@@ -2,30 +2,44 @@
 
 const websocket = require("ws");
 const messages = require("./public/javascripts/messages");
+const CardGrid = require("./cardGrid")
 
+const TURN_TIME = 5000
 
 /**
- * Game constructor. Every game has two players, identified by their WebSocket.
- * @param {number} gameID every game has a unique game identifier.
+ * Game constructor. Every Game has two players, identified by their WebSocket.
+ * @param {number} GameID every Game has a unique Game identifier.
  */
-const game = function(gameID) {
+const Game = function(GameID) {
     this.playerA = null;
     this.playerB = null;
     this.readyA = false;
     this.readyB = false;
+    this.scoreA = 0;
+    this.scoreB = 0;
     this.currentPlayer = null;
-    this.id = gameID;
-    this.gameState = "0 PLAYERS"; //"A" means A won, "B" means B won, "ABORTED" means the game was aborted
+    this.id = GameID;
+    this.gameState = "0 PLAYERS"; //"A" means A won, "B" means B won, "ABORTED" means the Game was aborted
     this.time = 0;
     this.turns = [];
     this.cardGrid = null;
+    this.timeoutID = null;
 };
 
+Game.prototype.getClientGameState = function() {
+    return {
+        "id" : this.id,
+        "cardGrid" : this.cardGrid.getClientCardGridState(),
+        "scoreA" : this.scoreA,
+        "scoreB" : this.scoreB,
+        "time": this.time      
+    }
+}
 
 /*
  * All valid transition states are keys of the transitionStates object.
  */
-game.prototype.transitionStates = {
+Game.prototype.transitionStates = {
     "0 PLAYERS": 0,
     "1 PLAYERS": 1,
     "2 PLAYERS": 2,
@@ -38,10 +52,10 @@ game.prototype.transitionStates = {
 
 
 /*
- * Not all game states can be transformed into each other; the transitionMatrix object encodes the valid transitions.
+ * Not all Game states can be transformed into each other; the transitionMatrix object encodes the valid transitions.
  * Valid transitions have a value of 1. Invalid transitions have a value of 0.
  */
-game.prototype.transitionMatrix = [
+Game.prototype.transitionMatrix = [
     [0, 1, 0, 0, 0, 0, 0], //0 PLAYERS
     [1, 0, 1, 0, 0, 0, 0], //1 PLAYERS
     [0, 0, 0, 1, 0, 0, 1], //2 PLAYERS (note: once we have two players, there is no way back!)
@@ -58,21 +72,21 @@ game.prototype.transitionMatrix = [
  * @param {string} to ending transition state
  * @returns {boolean} true if the transition is valid, false otherwise
  */
-game.prototype.isValidTransition = function(from, to) {
+Game.prototype.isValidTransition = function(from, to) {
     let i, j;
-    if (!(from in game.prototype.transitionStates)) {
+    if (!(from in Game.prototype.transitionStates)) {
         return false;
     } else {
-        i = game.prototype.transitionStates[from];
+        i = Game.prototype.transitionStates[from];
     }
 
-    if (!(to in game.prototype.transitionStates)) {
+    if (!(to in Game.prototype.transitionStates)) {
         return false;
     } else {
-        j = game.prototype.transitionStates[to];
+        j = Game.prototype.transitionStates[to];
     }
 
-    return game.prototype.transitionMatrix[i][j] > 0;
+    return Game.prototype.transitionMatrix[i][j] > 0;
 };
 
   /**
@@ -80,28 +94,28 @@ game.prototype.isValidTransition = function(from, to) {
    * @param {string} s state to check
    * @returns {boolean}
    */
-game.prototype.isValidState = function(s) {
-    return s in game.prototype.transitionStates;
+Game.prototype.isValidState = function(s) {
+    return s in Game.prototype.transitionStates;
 };
 
 
 /**
- * Checks whether the game is full.
- * @returns {boolean} returns true if the game is full (2 players), false otherwise
+ * Checks whether the Game is full.
+ * @returns {boolean} returns true if the Game is full (2 players), false otherwise
  */
-game.prototype.hasTwoConnectedPlayers = function() {
+Game.prototype.hasTwoConnectedPlayers = function() {
     return this.gameState == "2 PLAYERS";
 };
 
 
 /**
- * Updates the game status to `w` if the state is valid and the transition to `w` is valid.
- * @param {string} w new game status
+ * Updates the Game status to `w` if the state is valid and the transition to `w` is valid.
+ * @param {string} w new Game status
  */
-game.prototype.setStatus = function(w) {
+Game.prototype.setStatus = function(w) {
     if (
-        game.prototype.isValidState(w) &&
-        game.prototype.isValidTransition(this.gameState, w)
+        Game.prototype.isValidState(w) &&
+        Game.prototype.isValidTransition(this.gameState, w)
     ) {
         this.gameState = w;
         console.log("[STATUS] %s", this.gameState);
@@ -112,14 +126,12 @@ game.prototype.setStatus = function(w) {
     }
 };
 
-
-
 /**
- * Adds a player to the game. Returns an error if a player cannot be added to the current game.
+ * Adds a player to the Game. Returns an error if a player cannot be added to the current Game.
  * @param {websocket} p WebSocket object of the player
  * @returns {(string|Error)} returns "A" or "B" depending on the player added; returns an error if that isn't possible
  */
-game.prototype.addPlayer = function(p) {
+Game.prototype.addPlayer = function(p) {
     if (this.gameState != "0 PLAYERS" && this.gameState != "1 PLAYERS") {
         return new Error(
             `Invalid call to addPlayer, current state is ${this.gameState}`
@@ -140,7 +152,7 @@ game.prototype.addPlayer = function(p) {
     }
 };
 
-game.prototype.readyPlayer = function(pString) {
+Game.prototype.readyPlayer = function(pString) {
     if (this.gameState != "2 PLAYERS") {
         return new Error(
             `Invalid call to readyPlayer, current state is ${this.gameState}`
@@ -166,141 +178,148 @@ game.prototype.readyPlayer = function(pString) {
     msg.data = pString
     this.playerA.send(JSON.stringify(msg))
     this.playerB.send(JSON.stringify(msg))
-
-    
-
 }
 
 
 /**
  * 
  */
-game.prototype.doTurn = function() {
+Game.prototype.doTurn = function() {
     if (this.gameState != "IN-GAME") {
         return new Error(
             `Invalid call to doTurn, current state is ${this.gameState}`
         );
     }
+
+    if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+        this.timeoutID = null
+        console.log("stopping turn early")
+    }
+    
     console.log(`turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
+
+    // send a turn message to the player
     let turnMsg = messages.O_PLAYER_TURN;
     turnMsg.data = this.turns.length;
     this.currentPlayer.send(JSON.stringify(turnMsg))
 
+    // clear all previously turned cards
+    this.cardGrid.resetTurned();
 
-    setTimeout(() =>{ 
-        console.log(`end of turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
+    // wait for TURN_TIME to this
+    this.timeoutID = setTimeout(() =>{ 
 
-        let endTurnMsg = messages.O_TIMER_RUN_OUT;
-        endTurnMsg.data = 0;
-        this.currentPlayer.send(JSON.stringify(endTurnMsg))
-        this.currentPlayer = this.currentPlayer == this.playerA ? this.playerB : this.playerA;
-        this.doTurn()
+        // send an end of turn message to the player
+        let timerRunOutMsg = messages.O_TIMER_RUN_OUT;
+        timerRunOutMsg.data = TURN_TIME;
+        this.currentPlayer.send(JSON.stringify(timerRunOutMsg))
+        this.timeoutID = null;
+
+        this.swapTurn()
     
-    }, 2000);
-
-
+    }, TURN_TIME);
 };
 
+Game.prototype.swapTurn = function() {
+    console.log(messages.S_END_TURN)
+
+    this.currentPlayer.send(messages.S_END_TURN)
+
+    console.log(`end of turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
+
+    // swap the current player
+    this.currentPlayer = this.currentPlayer == this.playerA ? this.playerB : this.playerA;
+
+    // do new turn
+    this.doTurn()
+}
+
+
+Game.prototype.turnCard = function(cardId) {
+
+    // turn the actual card server side
+    this.cardGrid.turnCard(cardId);
+
+    // console.log(this.cardGrid.turnedCards)
+
+    // send the turned cards to the current player
+    let msg = messages.O_TURNED_CARDS;
+    msg.data = {"turnedCards" : null, "newCard": null}
+    msg.data.turnedCards = this.cardGrid.turnedCards.map(e => {e.getClientTurnedCard()})
+    msg.data.newCard = this.cardGrid.lastTurnedCard;
+    console.log(msg)
+    // this.currentPlayer.send(JSON.stringify(msg))
+    this.playerA.send(JSON.stringify(msg))
+    this.playerB.send(JSON.stringify(msg))
+
+    // if 2 cards are turned check for a match
+    if (this.cardGrid.turnedCards.length > 1) {
+        const isMatch = this.cardGrid.checkTurnedCards()
+
+        // delay checking to see the second card longer.
+        if (isMatch) {
+            // add score
+            console.log("match")
+            // this.currentPlayer.addScore();
+
+            let msg = messages.O_CARD_MATCH
+            msg.data = this.cardGrid.turnedCards
+
+            this.playerA.send(JSON.stringify(msg))
+            this.playerB.send(JSON.stringify(msg))
+
+
+            this.cardGrid.resetTurned();
+
+
+        }
+        else {
+            console.log("bad move. other turn")
+            console.log(messages.S_BAD_MOVE)
+            this.currentPlayer.send(messages.S_BAD_MOVE)
+            this.swapTurn()
+
+        }
+
+    }
+}
 
 
 
-game.prototype.start = function(cardData) {
+
+Game.prototype.start = function(cardData) {
     /*
     * once we have two players and they are ready, there is no way back;
-    * a new game object is created;
-    * if a player now leaves, the game is aborted (player is not preplaced)
+    * a new Game object is created;
+    * if a player now leaves, the Game is aborted (player is not preplaced)
     */
     if (this.gameState != "2 PLAYERS") {
         return new Error(
             `Invalid call to start, current state is ${this.gameState}`
         );
     }  
-    console.log(`starting game ${this.id}...`)
+    console.log(`starting Game ${this.id}...`)
 
     this.cardGrid = new CardGrid(cardData);
 
+    // send the initial game board to the players. TODO: can this be omitted? It only needs to send ids like "card-1"
     let msg = messages.O_MEMORY_BOARD;
     msg.data = cardData;
     this.playerA.send(JSON.stringify(msg));
     this.playerB.send(JSON.stringify(msg));
 
     this.setStatus("PRE-GAME") // TODO: maybe add a count down timer 3... 2... 1... GO!
+    
+    // set the game status to in game
     this.setStatus("IN-GAME")
+
+    // set the first player (playerA) as current player
     this.currentPlayer = this.playerA;
+
+    // do the first turn
     this.doTurn();
 }
   
 
-
-const Card = function(id, image, text, matchId) {
-    this.id = id;
-    this.matchId = matchId;
-    this.text = text;
-    this.image = image;
-    this.isMatched = false;
-    this.isTurned = false;
-}
-
-Card.prototype.getClientCard = function() {
-    return {"id": this.id}
-}
-
-function createCards(cardData) {
-    let cards = [];
-    cardData.forEach(card => {
-        cards.push(
-            new Card(card.id, card.image, card.text, card.matchId)
-        );
-    });
-    return cards;
-}
-
-const CardGrid = function(cardData) {
-    this.cards = createCards(cardData)
-    this.turnedCards = []
-}
-
-CardGrid.prototype.turnCard = function(cardId) {
-
-    this.cards.every(card => {
-        if(card.getId() === cardId) {
-            card.isTurned = true;
-            this.turnedCards.push(card)
-            return false;
-        }
-        return true;
-    });
-
-    if (this.checkTurnedCards.length === 2) {
-        this.checkTurnedCards()
-    }
-}
-
-CardGrid.prototype.checkTurnedCards = function() {
-    if (this.checkTurnedCards.length !== 2) {
-        return new Error(`length of turnedCards must be 2, the current length is ${this.checkTurnedCards.length}`)
-    }
-    if (!this.turnedCards[0].isMatched && !this.turnedCards[1].isMatched) {
-        const isMatch = this.turnedCards[0].matchId === this.turnedCards[1].matchId;
-        if (isMatch) {
-            this.turnedCards[0].isMatched = true;
-            this.turnedCards[0].isTurned = false;
-            this.turnedCards[1].isMatched = true;
-            this.turnedCards[1].isTurned = false;
-            return true
-        }
-        else {
-            this.turnedCards[0].isTurned = false;
-            this.turnedCards[1].isTurned = false;
-            this.turnedCards = [];
-            return false
-        }
-    }
-
-}
-
-CardGrid.prototype.getTurnedCards = function() {
-    return this.getTurnedCards
-}
-
-module.exports = game;
+module.exports = Game;

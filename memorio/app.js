@@ -87,10 +87,9 @@ wss.on("connection", function connection(ws) {
         }
       }
       else if(currentGame.gameState == "IN-GAME") {
-        console.log(`incoming game message at ${currentGame.id} `)
         const obj = JSON.parse(message.toString());
         if(obj.type == messages.T_CARD_TURNED) {
-          console.log(obj.data)
+          currentGame.turnCard(obj.data.cardId)
         }
       }
     }
