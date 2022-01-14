@@ -126,6 +126,11 @@
           finding.classList.add("hidden")
           ready.classList.remove("hidden")
         }
+
+        if(incomingMsg.type == Messages.T_GAME_ABORTED){
+          serverinfo = document.getElementById("server-info");
+          serverinfo.innerHTML = "Game Aborted.";
+        }
     };
 
     document.getElementById("ready").onclick = function(){
@@ -140,7 +145,6 @@
 
     //server sends a close event only if the game was aborted from some side
     socket.onclose = function () {
-
     };
 
     socket.onerror = function () {};
