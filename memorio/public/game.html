@@ -10,48 +10,89 @@
 </head>
 <body>
   <main>
-    <img src = "images/brainlogo.png" width=100px />
-    <h1>Memorio</h1>
-    <h2>A quick memory game that improves your brain</h2>
-    <button id = "ready">Ready for new game!</button>
-    <div class="dropdown">
-      <button class="dropbtn">Menu</button>
-      <div class="dropdown-content">
-        <a href="play">Singleplayer</a></li>
-        <a href="play">Multiplayer</a></li>
-        <!--<a href="">Settings</a></li> TODO TBI-->
+    <div class="main-grid">
+
+      <div class="left-main-grid-panel">
+        <div>
+          <img src = "images/brainlogo.png" width=100px />
+        </div>
+        <div>
+          <h1>Memorio</h1>
+          <h2>A quick memory game that improves your brain</h2>
+        </div>
+        <div>
+          <div id="finding">
+            Finding another player...
+          </div>
+          <div id = "ready" class="hidden">Ready?</div>
+        </div>
       </div>
-    </div>
-    <div id="timer">
-      00:00
-    </div>
-    <div id="current-player">
-    </div>
-    <div id="game-board">
-      <div id = "card-grid" class="grid-container">
+
+      <div class="right-main-grid-panel">
+        <div class="dropdown">
+          <button class="dropbtn">Menu</button>
+          <div class="dropdown-content">
+            <a href="play">Singleplayer</a></li>
+            <a href="play">Multiplayer</a></li>
+            <!--<a href="">Settings</a></li> TODO TBI-->
+          </div>
+        </div>
+        <div id="timer">
+          00:00
+        </div>
+      </div>
+
+      <div class="header-main-grid-panel">
+        <div id= "player-turn">
+          Game not started...
+        </div>
+      </div>
+
+      <div class="footer-main-grid-panel">
+        <div class="score-board">
+          <h1> Your Score: </h1>
+          <h1 id="your-score">
+            0
+          </h1>
+        </div>
+        <div id = "ready-you">
+          Not in a game
+        </div>
+        <div class="score-board">
+          <h1> Their Score: </h1>
+          <h1 id="other-score">
+            0
+          </h1>
+
+        </div>
+        <div id= "ready-other">
+          Not in a game
+        </div>
 
       </div>
+
+
+      <div id="game-board" class="game-board-panel">
+        <div id = "card-grid" class="card-grid-container">
+
+        </div>
+      </div>
+    
+
+     
+
+
+
+
     </div>
-    <div id="your-score">
-      Your score: 80
-    <div>
-    <div id="their-score">
-      Their score: 80
-    <div>
-    <div id="personal-best">
-      Personal best: 2
-    </div>
-    <div id = "ready-a">
-    </div>
-    <div id= "ready-b">
-    </div>
+
   </main>
 
+  <script src="javascripts/messages.js"></script>
   <script src="javascripts/timer.js"></script>
   <script src="javascripts/player.js"></script>
   <script src="javascripts/game.js"></script>
   <script src="javascripts/cardGrid.js"></script>
-  <script src="javascripts/messages.js"></script>
   <script src="javascripts/main.js"></script>
 
 </body>

@@ -1,35 +1,40 @@
 
 
 
-function Timer (seconds) {
+function Timer(timeStep) {
     this.element = document.getElementById("timer");
-
-    this.ms = seconds * 1000;
-    this.currentMs = this.ms;
-    this.timeStep = 100;
-    
+    this.timeStep = timeStep;
+    this.intervalID = null
 
     this.start = function () {
+        if (this.intervalID) {
+            this.stop();
+        }
 
 
-        // Update the count down every 1 second
-        var interval = setInterval(() => {
-            console.log(this.element)
-
+        // Update the count down every timestep
+        this.intervalID = setInterval(() => {
             this.updateTimer()
-        
+
             // If the count down is finished, write some text
             if (this.currentMs < 0) {
-                clearInterval(interval);
-                    this.element.innerText = "Done";
+                this.element.innerText = "OVERTIME";
             }
         }, this.timeStep);
     };
 
     this.updateTimer = function () {
         this.currentMs -= this.timeStep;
-            
         this.element.innerText = Math.floor(this.currentMs / 1000) + " : " + this.currentMs % 1000;
+    }
+
+    this.stop = function () {
+        clearInterval(this.intervalID)
+        this.intervalID = null;
+    }
+
+    this.set = function (ms) {
+        this.currentMs = ms
     }
 
     this.isDone = function () {
