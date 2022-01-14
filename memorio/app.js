@@ -117,6 +117,7 @@ wss.on("connection", function connection(ws) {
       if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
         currentGame.setStatus("ABORTED");
         console.log(`Game ${currentGame.id} aborted due to connection ${con["id"]} closing.`);
+
         gameStatus.gamesAborted++;
         currentGame.playerA.send(messages.S_GAME_ABORTED)
         currentGame.playerB.send(messages.S_GAME_ABORTED)
