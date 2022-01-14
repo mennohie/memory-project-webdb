@@ -1,6 +1,7 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+
 }
 
 a {
@@ -11,7 +12,39 @@ a {
   text-align: center;
 }
 
-.grid-container {
+.main-grid {
+  display: grid;
+  /* justify-content: center; */
+  grid-template-columns: 20% 60% 20%;
+  grid-template-rows: auto auto auto;
+  grid-gap: 5px;
+  padding: 5px;
+}
+
+.game-board-panel {
+  grid-column: 2;
+  grid-row: 2;
+  height: 100%;
+}
+
+.left-main-grid-panel{
+  grid-column: 1;
+  grid-row: 1 / span 3;
+}
+
+.right-main-grid-panel {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  display: grid;
+  grid-template-rows: 33% 33% 33%;
+}
+
+.footer-main-grid-panel {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.card-grid-container {
   display: grid;
   justify-content: center;
   grid-template-columns: auto auto auto auto;

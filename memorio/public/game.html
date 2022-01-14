@@ -10,48 +10,62 @@
 </head>
 <body>
   <main>
-    <img src = "images/brainlogo.png" width=100px />
-    <h1>Memorio</h1>
-    <h2>A quick memory game that improves your brain</h2>
-    <button id = "ready">Ready for new game!</button>
-    <div class="dropdown">
-      <button class="dropbtn">Menu</button>
-      <div class="dropdown-content">
-        <a href="play">Singleplayer</a></li>
-        <a href="play">Multiplayer</a></li>
-        <!--<a href="">Settings</a></li> TODO TBI-->
-      </div>
-    </div>
-    <div id="timer">
-      00:00
-    </div>
-    <div id= "player-type">
-    </div>
-    <div id="score-a">
+    <div class="main-grid">
 
-    </div>
-    <div id="score-b">
-      
-    </div>
-    <div id= "player-turn">
-    </div>
-    <div id="game-board">
-      <div id = "card-grid" class="grid-container">
-
+      <div class="left-main-grid-panel">
+        <img src = "images/brainlogo.png" width=100px />
+        <h1>Memorio</h1>
+        <h2>A quick memory game that improves your brain</h2>
+        <button id = "ready">Ready for new game!</button>
+        <div id="personal-best">
+          Personal best: 2
+        </div>
       </div>
-    </div>
-    <div id="your-score">
-      Your score: 80
-    <div>
-    <div id="their-score">
-      Their score: 80
-    <div>
-    <div id="personal-best">
-      Personal best: 2
-    </div>
-    <div id = "ready-a">
-    </div>
-    <div id= "ready-b">
+
+      <div class="right-main-grid-panel">
+        <div class="dropdown">
+          <button class="dropbtn">Menu</button>
+          <div class="dropdown-content">
+            <a href="play">Singleplayer</a></li>
+            <a href="play">Multiplayer</a></li>
+            <!--<a href="">Settings</a></li> TODO TBI-->
+          </div>
+        </div>
+        <div id="timer">
+          00:00
+        </div>
+      </div>
+
+      <div class="footer-main-grid-panel">
+        <div id= "player-type">
+        </div>
+        <div id="score-a">
+  
+        </div>
+        <div id="score-b">
+          
+        </div>
+        <div id= "player-turn">
+        </div>
+        <div id = "ready-a">
+        </div>
+        <div id= "ready-b">
+        </div>
+      </div>
+
+
+      <div id="game-board" class="game-board-panel">
+        <div id = "card-grid" class="card-grid-container">
+
+        </div>
+      </div>
+    
+
+     
+
+
+
+
     </div>
 
   </main>
