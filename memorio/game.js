@@ -57,8 +57,8 @@ Game.prototype.transitionStates = {
  */
 Game.prototype.transitionMatrix = [
     [0, 1, 0, 0, 0, 0, 0, 0], //0 PLAYERS
-    [1, 0, 1, 0, 0, 0, 0, 1], //1 PLAYERS
-    [0, 0, 0, 1, 0, 0, 1, 1], //2 PLAYERS (note: once we have two players, there is no way back!)
+    [1, 0, 1, 0, 0, 0, 0, 0], //1 PLAYERS
+    [0, 1, 0, 1, 0, 0, 1, 0], //2 PLAYERS (before both players are ready)
     [0, 0, 0, 0, 1, 0, 1, 1], //PRE-GAME
     [0, 0, 0, 0, 0, 1, 1, 1], // IN GAME
     [0, 0, 0, 0, 0, 1, 0, 0], //A WON

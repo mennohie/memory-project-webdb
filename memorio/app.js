@@ -19,6 +19,7 @@ app.use(express.static(__dirname + "/public"));
 const server = http.createServer(app);
 const wss = new websocket.Server({ server });
 const websockets = {}; //property: websocket, value: game
+const openGames = [];
 
 let currentGame = new Game(gameStatus.gamesInitialized++);
 let connectionID = 0; //each websocket receives a unique ID
@@ -51,8 +52,13 @@ wss.on("connection", function connection(ws) {
    */
   const con = ws;
   con["id"] = connectionID++;
-  if(currentGame.hasTwoConnectedPlayers()){
-    currentGame = new Game(gameStatus.gamesInitialized);
+  if(openGames.length != 0){
+    openGames.sort();
+    openGames.reverse();
+    currentGame = websockets[openGames.pop()];
+  }
+  else if(currentGame.hasTwoConnectedPlayers()){
+    currentGame = new Game(gameStatus.gamesInitialized++);
   }
   const playerType = currentGame.addPlayer(con);
   websockets[con["id"]] = currentGame;
@@ -117,10 +123,12 @@ wss.on("connection", function connection(ws) {
       if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
         currentGame.setStatus("ABORTED");
         console.log(`Game ${currentGame.id} aborted due to connection ${con["id"]} closing.`);
-
         gameStatus.gamesAborted++;
         currentGame.playerA.send(messages.S_GAME_ABORTED)
         currentGame.playerB.send(messages.S_GAME_ABORTED)
+      } if(currentGame.isValidTransition(currentGame.gameState, "1 PLAYERS")){
+        openGames.push(currentGame.id);
+        currentGame.setStatus("1 PLAYERS");
       }
 
       currentGame.removePlayer(con)
