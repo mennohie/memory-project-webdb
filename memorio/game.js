@@ -3,6 +3,7 @@
 const websocket = require("ws");
 const messages = require("./public/javascripts/messages");
 const CardGrid = require("./cardGrid")
+const gameStats = require("./gameStats")
 
 const TURN_TIME = 5000
 
@@ -32,7 +33,7 @@ Game.prototype.getClientGameState = function() {
         "cardGrid" : this.cardGrid.getClientCardGridState(),
         "scoreA" : this.scoreA,
         "scoreB" : this.scoreB,
-        "time": this.time      
+        "time": this.time
     }
 }
 
@@ -47,7 +48,8 @@ Game.prototype.transitionStates = {
     "IN-GAME": 4,
     "A": 5, //A won
     "B": 6, //B won
-    "ABORTED": 7
+    "ABORTED": 7,
+    "TIE": 8
 };
 
 
@@ -56,14 +58,14 @@ Game.prototype.transitionStates = {
  * Valid transitions have a value of 1. Invalid transitions have a value of 0.
  */
 Game.prototype.transitionMatrix = [
-    [0, 1, 0, 0, 0, 0, 0], //0 PLAYERS
-    [1, 0, 1, 0, 0, 0, 0], //1 PLAYERS
-    [0, 0, 0, 1, 0, 0, 1], //2 PLAYERS (note: once we have two players, there is no way back!)
-    [0, 0, 0, 0, 1, 0, 1], //PRE-GAME
-    [0, 0, 0, 0, 0, 1, 1], // IN GAME
-    [0, 0, 0, 0, 0, 1, 0], //A WON
-    [0, 0, 0, 0, 0, 1, 0], //B WON
-    [0, 0, 0, 0, 0, 0, 0] //ABORTED
+    [0, 1, 0, 0, 0, 0, 0, 0, 0], //0 PLAYERS
+    [1, 0, 1, 0, 0, 0, 0, 0, 0], //1 PLAYERS
+    [0, 1, 0, 1, 0, 0, 1, 0, 0], //2 PLAYERS (before both players are ready)
+    [0, 0, 0, 0, 1, 0, 0, 1, 0], //PRE-GAME
+    [0, 0, 0, 0, 0, 1, 1, 1, 1], // IN GAME
+    [0, 0, 0, 0, 0, 0, 0, 0, 0], //A WON
+    [0, 0, 0, 0, 0, 0, 0, 0, 0], //B WON
+    [0, 0, 0, 0, 0, 0, 0, 0, 0] //ABORTED
   ];
 
 /**
@@ -85,7 +87,8 @@ Game.prototype.isValidTransition = function(from, to) {
     } else {
         j = Game.prototype.transitionStates[to];
     }
-
+    console.log(Game.prototype.transitionMatrix[i][j]);
+    console.log(i + " and " + j)
     return Game.prototype.transitionMatrix[i][j] > 0;
 };
 
@@ -107,6 +110,9 @@ Game.prototype.hasTwoConnectedPlayers = function() {
     return this.gameState == "2 PLAYERS";
 };
 
+Game.prototype.isFinished = function() {
+    return this.gameState == "A" | this.gameState == "B" | this.gameState == "ABORTED" | this.gameState == "TIE";
+};
 
 /**
  * Updates the Game status to `w` if the state is valid and the transition to `w` is valid.
@@ -156,7 +162,7 @@ Game.prototype.removePlayer = function(p) {
     if (this.playerA == p) {
         this.playerA = null
         this.setStatus("1 PLAYERS")
-    }    
+    }
 
 }
 
@@ -165,7 +171,7 @@ Game.prototype.readyPlayer = function(pString) {
         return new Error(
             `Invalid call to readyPlayer, current state is ${this.gameState}`
         );
-    }  
+    }
 
     if (pString != "A" && pString != "B") {
         return new Error(
@@ -190,7 +196,7 @@ Game.prototype.readyPlayer = function(pString) {
 
 
 /**
- * 
+ *
  */
 Game.prototype.doTurn = function() {
     if (this.gameState != "IN-GAME") {
@@ -204,7 +210,7 @@ Game.prototype.doTurn = function() {
         this.timeoutID = null
         console.log("stopping turn early")
     }
-    
+
     console.log(`turn of player ${this.currentPlayer == this.playerA ? "A" : "B"}`)
 
     // send a turn message to the player
@@ -216,7 +222,7 @@ Game.prototype.doTurn = function() {
     this.cardGrid.resetTurned();
 
     // wait for TURN_TIME to this
-    this.timeoutID = setTimeout(() =>{ 
+    this.timeoutID = setTimeout(() =>{
 
         // send an end of turn message to the player
         let timerRunOutMsg = messages.O_TIMER_RUN_OUT;
@@ -225,7 +231,7 @@ Game.prototype.doTurn = function() {
         this.timeoutID = null;
 
         this.swapTurn()
-    
+
     }, TURN_TIME);
 };
 
@@ -276,7 +282,7 @@ Game.prototype.turnCard = function(cardId) {
 
 
             this.cardGrid.resetTurned();
-            
+
             if (this.checkForEnding()) {
                 this.end()
             }
@@ -306,7 +312,7 @@ Game.prototype.checkForEnding = function() {
 
 Game.prototype.end = function() {
     console.log("end game")
-
+    gameStats.gamesCompleted++;
     if (this.timeoutID) {
         clearTimeout(this.timeoutID);
         this.timeoutID = null
@@ -318,22 +324,31 @@ Game.prototype.end = function() {
     this.currentPlayer = null
 
     let winMsg = messages.O_GAME_WON_BY
-
+    if(this.scoreA > gameStats.highScore | this.scoreB > gameStats.highScore){
+      if(this.scoreA >= this.scoreB){
+        gameStats.highScore = this.scoreA;
+      } else {
+        gameStats.highScore = this.scoreB;
+      }
+    }
     if (this.scoreA > this.scoreB) {
-        winMsg.data = "A"
+        winMsg.data = "A";
+        this.setStatus("A")
     }
     else if (this.scoreA < this.scoreB){
         winMsg.data = "B"
+        this.setStatus("B")
     }
     else if (this.scoreA === this.scoreB) {
         winMsg.data = "TIE"
+        this.setStatus("TIE")
     }
 
     this.playerA.send(JSON.stringify(winMsg))
     this.playerB.send(JSON.stringify(winMsg))
 
-    
-        
+
+
 }
 
 Game.prototype.addScore = function(score) {
@@ -363,7 +378,7 @@ Game.prototype.start = function(cardData) {
         return new Error(
             `Invalid call to start, current state is ${this.gameState}`
         );
-    }  
+    }
     console.log(`starting Game ${this.id}...`)
 
     this.cardGrid = new CardGrid(cardData);
@@ -375,7 +390,7 @@ Game.prototype.start = function(cardData) {
     this.playerB.send(JSON.stringify(msg));
 
     this.setStatus("PRE-GAME") // TODO: maybe add a count down timer 3... 2... 1... GO!
-    
+
     // set the game status to in game
     this.setStatus("IN-GAME")
 
@@ -385,6 +400,6 @@ Game.prototype.start = function(cardData) {
     // do the first turn
     this.doTurn();
 }
-  
+
 
 module.exports = Game;

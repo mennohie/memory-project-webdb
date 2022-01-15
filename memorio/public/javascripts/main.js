@@ -1,19 +1,12 @@
-/* eslint-disable no-undef */
-// set everything up, including the WebSocket
-(function setup () {
-  // const socket = new WebSocket(Setup.WEB_SOCKET_URL);
-  const socket = new WebSocket('ws://localhost:8000')
-  const game = new Game(0, socket)
-  const timer = new Timer(100)
+//set everything up, including the WebSocket
+(function setup() {
 
-  socket.onmessage = function (event) {
-    const incomingMsg = JSON.parse(event.data)
+    // const socket = new WebSocket(Setup.WEB_SOCKET_URL);
+    const socket = new WebSocket("ws://" + window.location.host);
+    game = new Game(0, socket);
 
-    if (incomingMsg.type === Messages.T_MEMORY_BOARD) {
-      const cards = createCards(incomingMsg.data)
-      const cardGrid = new CardGrid(cards, socket)
-      game.setCardGrid(cardGrid)
-    }
+    timer = new Timer(100);
+
 
     // eslint-disable-next-line no-undef
     if (incomingMsg.type === Messages.T_PLAYER_TYPE) {
@@ -87,6 +80,10 @@
         game.scoreA = incomingMsg.data.currentScore
         if (game.playerType == "A") {
           document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
+          // If the current score is higher than the highscore, also increase personal best
+          if(game.scoreA > parseInt(getCookie("highScore"))){
+            setCookie("highScore", game.scoreA, 1825)
+          }
         }
         else if (game.playerType == "B") {
           document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
@@ -95,7 +92,11 @@
       else if (incomingMsg.data.player == "B") {
         game.scoreB = incomingMsg.data.currentScore
         if (game.playerType == "B") {
-          document.getElementById("you-score").innerHTML = `${incomingMsg.data.currentScore}`;
+          document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
+          // If the current score is higher than the highscore, also increase personal best
+          if(game.scoreB > parseInt(getCookie("highScore"))){
+            functions.setCookie("highScore", game.scoreA, 1825)
+          }
         }
         else if (game.playerType == "A") {
           document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
@@ -105,9 +106,15 @@
     }
 
     if (incomingMsg.type == Messages.T_GAME_WON_BY) {
-      document.getElementById('game-board').innerHTML = `GAME WON BY: ${incomingMsg.data}`
+      overlapCss = document.getElementById('server-info');
+      overlapCss.hidden = false;
+      overlapCss.style.border = "3px solid green";
+
+      document.getElementById('server-info').innerHTML = `Game won by: ${incomingMsg.data}. Congratulations!`
+
       // game.timer.stop();
     }
+  
 
     if (incomingMsg.type == Messages.T_FOUND_GAME) {
       console.log(incomingMsg)
@@ -116,7 +123,11 @@
       finding.classList.add("hidden")
       ready.classList.remove("hidden")
     }
-  };
+
+    if(incomingMsg.type == Messages.T_GAME_ABORTED){
+      serverinfo = document.getElementById("server-info");
+      serverinfo.innerHTML = "Game Aborted.";
+    }
 
   document.getElementById("ready").onclick = function () {
     let msg = Messages.O_PLAYER_READY
