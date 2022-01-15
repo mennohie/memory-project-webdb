@@ -6,5 +6,5 @@ if(getCookie("highScore") == undefined){
 serverInfo = JSON.parse(getResponse(window.location.protocol + "//" + window.location.host + "/publicserverdata"));
 
 document.getElementById("personal-best").innerHTML = getCookie("highScore");
-document.getElementById("brains-improved").innerHTML = serverInfo.gamesInitialized;
+document.getElementById("brains-improved").innerHTML = serverInfo.gamesCompleted;
 document.getElementById("top-score").innerHTML = serverInfo.highScore;

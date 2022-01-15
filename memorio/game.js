@@ -3,6 +3,7 @@
 const websocket = require("ws");
 const messages = require("./public/javascripts/messages");
 const CardGrid = require("./cardGrid")
+const gameStats = require("./gameStats")
 
 const TURN_TIME = 5000
 
@@ -47,7 +48,8 @@ Game.prototype.transitionStates = {
     "IN-GAME": 4,
     "A": 5, //A won
     "B": 6, //B won
-    "ABORTED": 7
+    "ABORTED": 7,
+    "TIE": 8
 };
 
 
@@ -56,14 +58,14 @@ Game.prototype.transitionStates = {
  * Valid transitions have a value of 1. Invalid transitions have a value of 0.
  */
 Game.prototype.transitionMatrix = [
-    [0, 1, 0, 0, 0, 0, 0, 0], //0 PLAYERS
-    [1, 0, 1, 0, 0, 0, 0, 0], //1 PLAYERS
-    [0, 1, 0, 1, 0, 0, 1, 0], //2 PLAYERS (before both players are ready)
-    [0, 0, 0, 0, 1, 0, 1, 1], //PRE-GAME
-    [0, 0, 0, 0, 0, 1, 1, 1], // IN GAME
-    [0, 0, 0, 0, 0, 0, 0, 0], //A WON
-    [0, 0, 0, 0, 0, 0, 0, 0], //B WON
-    [0, 0, 0, 0, 0, 0, 0, 0] //ABORTED
+    [0, 1, 0, 0, 0, 0, 0, 0, 0], //0 PLAYERS
+    [1, 0, 1, 0, 0, 0, 0, 0, 0], //1 PLAYERS
+    [0, 1, 0, 1, 0, 0, 1, 0, 0], //2 PLAYERS (before both players are ready)
+    [0, 0, 0, 0, 1, 0, 0, 1, 0], //PRE-GAME
+    [0, 0, 0, 0, 0, 1, 1, 1, 1], // IN GAME
+    [0, 0, 0, 0, 0, 0, 0, 0, 0], //A WON
+    [0, 0, 0, 0, 0, 0, 0, 0, 0], //B WON
+    [0, 0, 0, 0, 0, 0, 0, 0, 0] //ABORTED
   ];
 
 /**
@@ -108,6 +110,9 @@ Game.prototype.hasTwoConnectedPlayers = function() {
     return this.gameState == "2 PLAYERS";
 };
 
+Game.prototype.isFinished = function() {
+    return this.gameState == "A" | this.gameState == "B" | this.gameState == "ABORTED" | this.gameState == "TIE";
+};
 
 /**
  * Updates the Game status to `w` if the state is valid and the transition to `w` is valid.
@@ -307,7 +312,7 @@ Game.prototype.checkForEnding = function() {
 
 Game.prototype.end = function() {
     console.log("end game")
-
+    gameStats.gamesCompleted++;
     if (this.timeoutID) {
         clearTimeout(this.timeoutID);
         this.timeoutID = null
@@ -319,15 +324,24 @@ Game.prototype.end = function() {
     this.currentPlayer = null
 
     let winMsg = messages.O_GAME_WON_BY
-
+    if(this.scoreA > gameStats.highScore | this.scoreB > gameStats.highScore){
+      if(this.scoreA >= this.scoreB){
+        gameStats.highScore = this.scoreA;
+      } else {
+        gameStats.highScore = this.scoreB;
+      }
+    }
     if (this.scoreA > this.scoreB) {
-        winMsg.data = "A"
+        winMsg.data = "A";
+        this.setStatus("A")
     }
     else if (this.scoreA < this.scoreB){
         winMsg.data = "B"
+        this.setStatus("B")
     }
     else if (this.scoreA === this.scoreB) {
         winMsg.data = "TIE"
+        this.setStatus("TIE")
     }
 
     this.playerA.send(JSON.stringify(winMsg))

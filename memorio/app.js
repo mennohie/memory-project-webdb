@@ -57,7 +57,7 @@ wss.on("connection", function connection(ws) {
     openGames.reverse();
     currentGame = websockets[openGames.pop()];
   }
-  else if(currentGame.hasTwoConnectedPlayers()){
+  else if(currentGame.hasTwoConnectedPlayers() | currentGame.isFinished()){
     currentGame = new Game(gameStatus.gamesInitialized++);
   }
   const playerType = currentGame.addPlayer(con);
