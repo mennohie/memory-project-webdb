@@ -22,22 +22,32 @@ function Card (id) {
   this.imgElement.setAttribute('width', '100%')
   this.imgElement.src = BACKFACE_IMAGE
 
+  this.textElement = document.createElement('p')
+  this.textElement.classList.add('text-card')
+
+  this.element.classList.add('card')
+  this.element.appendChild(this.imgElement)
+  this.element.appendChild(this.textElement)
+
   this.turnOver = function (image, text) {
     if (!this.isMatched) {
       if (!this.isTurned && image != null && text != null) {
         // turn front
         this.element.classList.add(ROTATE_CLASS_NAME)
         this.imgElement.src = frontfaceImage(image)
+        this.textElement.innerHTML = text
       } else {
         // turn back
         this.element.classList.remove(ROTATE_CLASS_NAME)
         this.imgElement.src = BACKFACE_IMAGE
+        this.textElement.innerHTML = ''
       }
       this.isTurned = !this.isTurned
       return this.isTurned
     } else {
       this.element.classList.add(ROTATE_CLASS_NAME)
       this.imgElement.src = frontfaceImage(this.image)
+      this.textElement.innerHTML = text
     }
     return this.isMatched
   }
@@ -51,12 +61,11 @@ function Card (id) {
       // turn back
       this.element.classList.remove(ROTATE_CLASS_NAME)
       this.imgElement.src = BACKFACE_IMAGE
+      this.textElement.innerHTML = ''
     }
   }
 
-  this.render = function () {
-    this.element.classList.add('card')
-    this.element.appendChild(this.imgElement)
+  this.getElement = function () {
     return this.element
   }
 }
@@ -78,9 +87,9 @@ class CardGrid {
     this.turnedCards = []
     this.isActivePlayer = false
 
-    this.cards.forEach(element => {
+    this.cards.forEach(card => {
       this.cardGridElement.appendChild(
-        element.render()
+        card.getElement()
       )
     })
 
