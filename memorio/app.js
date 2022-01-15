@@ -50,6 +50,7 @@ wss.on('connection', function connection (ws) {
   * two-player game: every two players are added to the same game
   */
   const con = ws
+  // @ts-ignore
   con.id = connectionID++
   if (openGames.length !== 0) {
     openGames.sort()
@@ -59,9 +60,11 @@ wss.on('connection', function connection (ws) {
     currentGame = new Game(gameStatus.gamesInitialized++)
   }
   const playerType = currentGame.addPlayer(con)
+  // @ts-ignore
   websockets[con.id] = currentGame
 
   console.log(
+    // @ts-ignore
     `Player ${con.id} placed in game ${currentGame.id} as ${playerType}`
   )
 
@@ -82,6 +85,7 @@ wss.on('connection', function connection (ws) {
     console.log(message.toString())
 
     const msg = JSON.parse(message.toString())
+    // @ts-ignore
     currentGame = websockets[con.id]
 
     if (message.toString() !== undefined) {
@@ -105,16 +109,19 @@ wss.on('connection', function connection (ws) {
     * code 1001 means almost always closing initiated by the client;
     * source: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
     */
+    // @ts-ignore
     console.log(`${con.id} disconnected ...`)
 
     if (code === 1001) {
       /*
       * if possible, abort the game; if not, the game is already completed
       */
+      // @ts-ignore
       const currentGame = websockets[con.id]
 
       if (currentGame.isValidTransition(currentGame.gameState, 'ABORTED')) {
         currentGame.setStatus('ABORTED')
+        // @ts-ignore
         console.log(`Game ${currentGame.id} aborted due to connection ${con.id} closing.`)
         gameStatus.gamesAborted++
         currentGame.playerA.send(messages.S_GAME_ABORTED)
@@ -130,19 +137,23 @@ wss.on('connection', function connection (ws) {
 })
 server.listen(port)
 
+// @ts-ignore
 app.get('/', function (req, res) {
   res.sendFile('splash.html', { root: './memorio/public' })
 })
 
+// @ts-ignore
 app.get('/publicserverdata', function (req, res) {
   res.send(gameStatus)
 })
 
+// @ts-ignore
 app.get('/play', function (req, res) {
   res.sendFile('game.html', { root: './memorio/public' })
 })
 
 // Default if route is not known
+// @ts-ignore
 app.get('/*', function (req, res) {
   res.send('404 not found.')
 })

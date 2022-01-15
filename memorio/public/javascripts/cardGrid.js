@@ -3,6 +3,7 @@
 
 const ROTATE_CLASS_NAME = 'rotate'
 const BACKFACE_IMAGE = 'images/brainlogo.png'
+const DELAY_TIME_CARD_RESET = 1000
 
 function frontfaceImage (id) {
   return `images/${id}.png`
@@ -59,9 +60,12 @@ function Card (id) {
       this.imgElement.src = frontfaceImage(this.image)
     } else {
       // turn back
-      this.element.classList.remove(ROTATE_CLASS_NAME)
-      this.imgElement.src = BACKFACE_IMAGE
-      this.textElement.innerHTML = ''
+      // add client side delay to turn the cards back, but allow the server to continue the game
+      setTimeout(() => {
+        this.element.classList.remove(ROTATE_CLASS_NAME)
+        this.imgElement.src = BACKFACE_IMAGE
+        this.textElement.innerHTML = ''
+      }, DELAY_TIME_CARD_RESET)
     }
   }
 
