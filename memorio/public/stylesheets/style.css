@@ -102,6 +102,7 @@ a {
 }
 
 .card {
+  position: relative;
   width: 128px;
   padding: 5px;
 }
@@ -114,6 +115,13 @@ a {
 
 .rotate {
   background-color: rgb(255, 255, 255)
+}
+
+.text-card {
+  position: absolute;
+  text-align: center;
+  top: 49px;
+  width: 100%;
 }
 
 .server-info {
