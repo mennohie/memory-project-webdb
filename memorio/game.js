@@ -61,8 +61,8 @@ Game.prototype.transitionMatrix = [
     [0, 1, 0, 1, 0, 0, 1, 0], //2 PLAYERS (before both players are ready)
     [0, 0, 0, 0, 1, 0, 1, 1], //PRE-GAME
     [0, 0, 0, 0, 0, 1, 1, 1], // IN GAME
-    [0, 0, 0, 0, 0, 1, 0, 0], //A WON
-    [0, 0, 0, 0, 0, 1, 0, 0], //B WON
+    [0, 0, 0, 0, 0, 0, 0, 0], //A WON
+    [0, 0, 0, 0, 0, 0, 0, 0], //B WON
     [0, 0, 0, 0, 0, 0, 0, 0] //ABORTED
   ];
 

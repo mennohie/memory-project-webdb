@@ -153,7 +153,7 @@
     }
 
     socket.onopen = function () {
-
+      
     };
 
     //server sends a close event only if the game was aborted from some side

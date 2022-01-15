@@ -17,3 +17,11 @@ function setCookie(cName, cValue, expDays) {
         const expires = "expires=" + date.toUTCString();
         document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
 }
+
+// Get json from API endpoint
+function getResponse(yourUrl){
+    var Httpreq = new XMLHttpRequest(); // a new request
+    Httpreq.open("GET",yourUrl,false);
+    Httpreq.send(null);
+    return Httpreq.responseText;
+}
