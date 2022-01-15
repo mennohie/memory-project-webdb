@@ -97,6 +97,10 @@
             game.scoreA = incomingMsg.data.currentScore
             if (game.playerType == "A") {
               document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
+              // If the current score is higher than the highscore, also increase personal best
+              if(game.scoreA > parseInt(getCookie("highScore"))){
+                setCookie("highScore", game.scoreA, 1825)
+              }
             }
             else if (game.playerType == "B") {
               document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
@@ -106,6 +110,10 @@
             game.scoreB = incomingMsg.data.currentScore
             if (game.playerType == "B") {
               document.getElementById("your-score").innerHTML = `${incomingMsg.data.currentScore}`;
+              // If the current score is higher than the highscore, also increase personal best
+              if(game.scoreB > parseInt(getCookie("highScore"))){
+                functions.setCookie("highScore", game.scoreA, 1825)
+              }
             }
             else if (game.playerType == "A") {
               document.getElementById("other-score").innerHTML = `${incomingMsg.data.currentScore}`;
@@ -145,7 +153,7 @@
     }
 
     socket.onopen = function () {
-
+      
     };
 
     //server sends a close event only if the game was aborted from some side

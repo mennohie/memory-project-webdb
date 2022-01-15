@@ -48,8 +48,8 @@ const cardData = [
 
 wss.on("connection", function connection(ws) {
   /*
-   * two-player game: every two players are added to the same game
-   */
+  * two-player game: every two players are added to the same game
+  */
   const con = ws;
   con["id"] = connectionID++;
   if(openGames.length != 0){
@@ -57,7 +57,7 @@ wss.on("connection", function connection(ws) {
     openGames.reverse();
     currentGame = websockets[openGames.pop()];
   }
-  else if(currentGame.hasTwoConnectedPlayers()){
+  else if(currentGame.hasTwoConnectedPlayers() | currentGame.isFinished()){
     currentGame = new Game(gameStatus.gamesInitialized++);
   }
   const playerType = currentGame.addPlayer(con);
@@ -75,49 +75,46 @@ wss.on("connection", function connection(ws) {
   }
 
   /*
-   * message coming in from a player:
-   *  1. determine the game object
-   *  2. determine the opposing player OP
-   *  3. send the message to OP
-   */
+  * message coming in from a player:
+  *  1. determine the game object
+  *  2. determine the opposing player OP
+  *  3. send the message to OP
+  */
   con.on("message", function incoming(message) {
+    console.log(message.toString())
+
+    const msg = JSON.parse(message.toString());
     currentGame = websockets[con["id"]];
 
-
     if (message.toString() != undefined) {
-      console.log(message.toString())
 
       if(currentGame.gameState == "2 PLAYERS") {
-        const obj = JSON.parse(message.toString());
-        console.log(obj)
-        if(obj.type == messages.T_PLAYER_READY){
-          currentGame.readyPlayer(obj.data)
+        if(msg.type == messages.T_PLAYER_READY){
+          currentGame.readyPlayer(msg.data)
           if(currentGame.readyA && currentGame.readyB && currentGame.hasTwoConnectedPlayers()){
             currentGame.start(cardData)
           }
         }
       }
       else if(currentGame.gameState == "IN-GAME") {
-        const obj = JSON.parse(message.toString());
-        if(obj.type == messages.T_CARD_TURNED) {
-          currentGame.turnCard(obj.data.cardId)
+        if(msg.type == messages.T_CARD_TURNED) {
+          currentGame.turnCard(msg.data.cardId)
         }
       }
     }
-
   });
 
   con.on("close", function(code) {
     /*
-     * code 1001 means almost always closing initiated by the client;
-     * source: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-     */
+    * code 1001 means almost always closing initiated by the client;
+    * source: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+    */
     console.log(`${con["id"]} disconnected ...`);
 
     if (code == 1001) {
       /*
-       * if possible, abort the game; if not, the game is already completed
-       */
+      * if possible, abort the game; if not, the game is already completed
+      */
       const currentGame = websockets[con["id"]];
 
       if (currentGame.isValidTransition(currentGame.gameState, "ABORTED")) {
@@ -141,6 +138,10 @@ server.listen(port);
 app.get("/", function(req, res){
   res.sendFile("splash.html", {root: "./memorio/public"});
 });
+
+app.get("/publicserverdata", function(req, res){
+  res.send(gameStatus)
+})
 
 app.get("/play", function(req, res){
   res.sendFile("game.html", {root: "./memorio/public"});
