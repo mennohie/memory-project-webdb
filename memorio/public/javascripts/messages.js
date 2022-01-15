@@ -131,9 +131,6 @@
     type: exports.T_CARD_MATCH,
     data: null
   }
-
-
-
-
+  
 })(typeof exports === "undefined" ? (this.Messages = {}) : exports);
 //if exports is undefined, we are on the client; else the server
