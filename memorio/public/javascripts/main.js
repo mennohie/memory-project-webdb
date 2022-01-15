@@ -49,7 +49,6 @@
     }
 
     if (incomingMsg.type === Messages.T_TURNED_CARDS) {
-      console.log(cardGrid.cards)
       console.log(incomingMsg.data)
       const newCard = incomingMsg.data.newCard
       game.cardGrid.turnOverCard(newCard.id, newCard.image, newCard.text)
