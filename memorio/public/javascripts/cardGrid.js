@@ -23,7 +23,7 @@ function Card (id) {
   this.imgElement.setAttribute('width', '100%')
   this.imgElement.src = BACKFACE_IMAGE
 
-  this.textElement = document.createElement('p')
+  this.textElement = document.createElement('div')
   this.textElement.classList.add('text-card')
 
   this.element.classList.add('card')
@@ -125,7 +125,6 @@ class CardGrid {
           if (element.id === cardId) {
             const msg = Messages.O_CARD_TURNED
             msg.data = { cardId: cardId }
-            console.log(msg)
             socket.send(JSON.stringify(msg))
 
             return false
