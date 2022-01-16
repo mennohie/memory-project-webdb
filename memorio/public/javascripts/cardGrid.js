@@ -44,6 +44,10 @@ function Card (id) {
         this.textElement.innerHTML = ''
       }
       this.isTurned = !this.isTurned
+      const cardFlipSound = document.getElementById('card-flip-sound')
+      cardFlipSound.pause()
+      cardFlipSound.currentTime = 0
+      cardFlipSound.play()
       return this.isTurned
     } else {
       this.element.classList.add(ROTATE_CLASS_NAME)

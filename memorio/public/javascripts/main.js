@@ -77,10 +77,19 @@
       timer.stop()
       timer.set(5000)
       timer.start()
+
+      const incorrectSound = document.getElementById('incorrect-sound')
+      incorrectSound.pause()
+      incorrectSound.currentTime = 0
+      incorrectSound.play()
     }
 
     if (incomingMsg.type === Messages.T_CARD_MATCH) {
       game.cardGrid.matchCards(incomingMsg.data)
+      const correctSound = document.getElementById('correct-sound')
+      correctSound.pause()
+      correctSound.currentTime = 0
+      correctSound.play()
     }
 
     if (incomingMsg.type === Messages.T_ADD_SCORE) {
