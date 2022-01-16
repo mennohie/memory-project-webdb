@@ -24,7 +24,7 @@ class Timer {
 
     this.updateTimer = function () {
       this.currentMs -= this.timeStep
-      this.element.innerText = Math.floor(this.currentMs / 1000) + ' : ' + this.currentMs % 1000
+      this.element.innerText = "0" + Math.floor(this.currentMs / 1000) + ':' + (this.currentMs % 1000)/100 + "00";
     }
 
     this.stop = function () {
