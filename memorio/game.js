@@ -6,7 +6,8 @@ const messages = require('./public/javascripts/messages')
 const CardGrid = require('./cardGrid')
 const gameStats = require('./gameStats')
 
-const TURN_TIME = 5000
+// Should be 5 seconds to the client, 500 ms extra to compensate time taken for server message
+const TURN_TIME = 5500
 
 /**
  * Game constructor. Every Game has two players, identified by their WebSocket.
@@ -214,6 +215,10 @@ Game.prototype.doTurn = function () {
   turnMsg.data = this.turns.length
   this.currentPlayer.send(JSON.stringify(turnMsg))
 
+  // Set timers for both players
+  this.playerA.send(JSON.stringify(messages.O_SET_TIMER));
+  this.playerB.send(JSON.stringify(messages.O_SET_TIMER));
+
   // clear all previously turned cards
   this.cardGrid.resetTurned()
 
@@ -365,18 +370,19 @@ Game.prototype.start = function (cardData) {
   // send the initial game board to the players. TODO: can this be omitted? It only needs to send ids like "card-1"
   const msg = messages.O_MEMORY_BOARD
   msg.data = cardData
-  this.playerA.send(JSON.stringify(msg))
-  this.playerB.send(JSON.stringify(msg))
+  this.playerA.send(JSON.stringify(msg));
+  this.playerB.send(JSON.stringify(msg));
+
 
   this.setStatus('PRE-GAME') // TODO: maybe add a count down timer 3... 2... 1... GO!
 
-  // set the game status to in game
+  // Set the game status to in game.
   this.setStatus('IN-GAME')
 
   // set the first player (playerA) as current player
   this.currentPlayer = this.playerA
 
-  // do the first turn
+  // Start the first turn
   this.doTurn()
 }
 

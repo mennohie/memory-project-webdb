@@ -145,7 +145,6 @@ a {
   background-color: white;
 }
 
-
 .play-image {
   position: absolute;
   top: 50%;
@@ -221,4 +220,9 @@ a {
   .alert-not-available {
     display: block;
   }
+}
+
+#timer {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 25px;
 }
