@@ -27,22 +27,22 @@ let connectionID = 0 // each websocket receives a unique ID
 
 // for testing
 const cardData = [
-  { id: 'card-0', image: 0, text: 'bladiebla #1', matchId: 0 },
-  { id: 'card-1', image: 1, text: 'bladiebla #2', matchId: 1 },
-  { id: 'card-2', image: 2, text: 'bladiebla #3', matchId: 2 },
-  { id: 'card-3', image: 3, text: 'bladiebla #4', matchId: 3 },
-  { id: 'card-4', image: 4, text: 'bladiebla #5', matchId: 4 },
-  { id: 'card-5', image: 5, text: 'bladiebla #6', matchId: 5 },
-  { id: 'card-6', image: 6, text: 'bladiebla #7', matchId: 6 },
-  { id: 'card-7', image: 7, text: 'bladiebla #8', matchId: 7 },
-  { id: 'card-8', image: 0, text: 'bladiebla #1', matchId: 0 },
-  { id: 'card-9', image: 1, text: 'bladiebla #2', matchId: 1 },
-  { id: 'card-10', image: 2, text: 'bladiebla #3', matchId: 2 },
-  { id: 'card-11', image: 3, text: 'bladiebla #4', matchId: 3 },
-  { id: 'card-12', image: 4, text: 'bladiebla #5', matchId: 4 },
-  { id: 'card-13', image: 5, text: 'bladiebla #6', matchId: 5 },
-  { id: 'card-14', image: 6, text: 'bladiebla #7', matchId: 6 },
-  { id: 'card-15', image: 7, text: 'bladiebla #8', matchId: 7 }
+  { id: 'card-0', image: 0, text: 'Wie a zegt moet ook b zeggen.', matchId: 0 },
+  { id: 'card-1', image: 1, text: 'De aanhouder wint.', matchId: 1 },
+  { id: 'card-2', image: 2, text: 'Als apen hoger klimmen willen, ziet men gauw hun blote billen.', matchId: 2 },
+  { id: 'card-3', image: 3, text: 'De appel valt niet ver van de boom.', matchId: 3 },
+  { id: 'card-4', image: 4, text: 'Om de kracht van het anker te voelen, moet men de storm trotseren.', matchId: 4 },
+  { id: 'card-5', image: 5, text: 'Wie bang leeft, gaat ook bang dood.', matchId: 5 },
+  { id: 'card-6', image: 6, text: 'Wie kaatst kan de bal verwachten.', matchId: 6 },
+  { id: 'card-7', image: 7, text: 'Wie wat bewaart, die heeft wat.', matchId: 7 },
+  { id: 'card-8', image: 0, text: 'Wie a zegt moet ook b zeggen.', matchId: 0 },
+  { id: 'card-9', image: 1, text: 'De aanhouder wint.', matchId: 1 },
+  { id: 'card-10', image: 2, text: 'Als apen hoger klimmen willen, ziet men gauw hun blote billen.', matchId: 2 },
+  { id: 'card-11', image: 3, text: 'De appel valt niet ver van de boom.', matchId: 3 },
+  { id: 'card-12', image: 4, text: 'Om de kracht van het anker te voelen, moet men de storm trotseren.', matchId: 4 },
+  { id: 'card-13', image: 5, text: 'Wie bang leeft, gaat ook bang dood.', matchId: 5 },
+  { id: 'card-14', image: 6, text: 'Wie kaatst kan de bal verwachten.', matchId: 6 },
+  { id: 'card-15', image: 7, text: 'Wie wat bewaart, die heeft wat.', matchId: 7 }
 ]
 
 wss.on('connection', function connection (ws) {
