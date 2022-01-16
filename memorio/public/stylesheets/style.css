@@ -3,6 +3,7 @@ body, html {
   height: 100%;
   width: 100%;
   margin: 0;
+  background-color: #bbecff;
 }
 
 main {
@@ -38,9 +39,14 @@ a {
 .game-board-panel {
   float: left;
   position: relative;
+  height: 100%;
+}
+
+.center-main-grid-panel {
   grid-column: 2;
   grid-row: 2;
-  height: 100%;
+  position: relative;
+  justify-content: center;
 }
 
 .left-main-grid-panel{
@@ -74,7 +80,10 @@ a {
 
 .footer-item {
   padding: 5px;
+}
 
+.title {
+  text-align: center;
 }
 
 .ready-button {
@@ -134,6 +143,83 @@ a {
   width: 50%;
   padding: 10px 10px 10px 10px;
   background-color: white;
+}
+
+.play-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.play-image:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-image:active {
+  filter: hue-rotate(180deg);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.stat-value{
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: large;
+  color:#3e99bd;
+}
+
+.stat-value::before {
+  content: "#";
+}
+
+.stat::before {
+  font-weight: normal;
+  content: "\01F525";
+}
+
+.stat::after {
+  font-weight: normal;
+  content: "\01F525";
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.alert-not-available {
+  display: none;
+  text-align: center;
+  font-size: x-large;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+@media only screen and (max-width: 1100px) {
+  .main-grid {
+    display: none;
+  }
+
+  .alert-not-available {
+    display: block;
+  }
 }
 
 #timer {

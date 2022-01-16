@@ -42,3 +42,7 @@ function getResponse (yourUrl) {
   Httpreq.send(null)
   return Httpreq.responseText
 }
+
+function goTo (path) {
+  window.location.href = path
+}
