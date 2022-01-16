@@ -126,7 +126,9 @@
 
       document.getElementById('server-info').innerHTML = `Game won by: ${incomingMsg.data}. Congratulations!`
       // TODO: add something like this:
-      // game.timer.stop();
+      timer.set(0);
+      timer.stop();
+      document.getElementById('timer').innerHTML = "Finished!";
     }
 
     if (incomingMsg.type === Messages.T_FOUND_GAME) {
