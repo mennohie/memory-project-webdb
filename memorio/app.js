@@ -45,6 +45,9 @@ const cardData = [
   { id: 'card-15', image: 7, text: 'Wie wat bewaart, die heeft wat.', matchId: 7 }
 ]
 
+// Comment out below to test on predictable set
+shuffle(cardData);
+
 wss.on('connection', function connection (ws) {
   /*
   * two-player game: every two players are added to the same game
@@ -157,3 +160,23 @@ app.get('/play', function (req, res) {
 app.get('/*', function (req, res) {
   res.send('404 not found.')
 })
+
+
+// Functions below
+function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
