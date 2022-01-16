@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node memorio/app.js 8000"
+    "start": "node memorio/app.js 443"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
