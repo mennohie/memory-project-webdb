@@ -4,6 +4,8 @@
 
 Documentation and assignments can be found in `doc.pdf`
 
+## Description
+
 Project where we make a memory web application game for the course Web and Databases
 
 Memorio - a quick memory game that improves your brain - that is our motto.
