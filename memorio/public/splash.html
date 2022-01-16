@@ -6,26 +6,51 @@
   <meta name="description" content="Memory game with a Delft theme.">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!-- <link rel="stylesheet" type="text/css" href="/css/style.css"> TBI -->
+  <link rel="stylesheet" type="text/css" href="./stylesheets/style.css">
 </head>
 <body>
-<div>
-  <h1 id="title">Memorio</h1>
-  <h2 id="title">A quick memory game that improves your brain!</h2>
-  <div class="dropdown">
-    <button class="dropbtn">Menu</button>
-    <div class="dropdown-content">
-      <a href="play">Singleplayer</a></li>
-      <a href="play">Multiplayer</a></li>
-      <a href="/">Homepage</a></li>
-      <!--<a href="">Settings</a></li> TODO TBI-->
+  <main>
+    <div class="alert-not-available">
+      We are sorry, it appears you have tunnel vision. Widen your view to a width of 1100px
     </div>
-  </div>
-  <img src="images/brainlogoplay.png">
-  <button class="playnow">Play game!</button>
-  <p class="scores">Beat the highest winning score: ##</p>
-  <p class="scores">Personal best: #</p>
-  <p class="scores" id="brainsimproved":>Improved ### brains</p>
-</div>
+    <div class="main-grid">
+      <div class="left-main-grid-panel">
+        <img src="images/brainlogo.png" width=100px>
+      </div>
+
+      <div class="header-main-grid-panel">
+        <div class="title">
+          <h1>Memorio</h1>
+          <h2>A quick memory game that improves your brain!</h2>
+        </div>
+      </div>
+
+
+      <div class="right-main-grid-panel">
+        <div class="dropdown">
+          <span> Menu</span>
+          <div class="dropdown-content">
+            <a href="play">Singleplayer</a></li>
+            <!--<a href="">Settings</a></li> TODO TBI-->
+          </div>
+        </div>
+      </div>
+
+      <div class="center-main-grid-panel" onclick="goTo('/play')">
+          <img class="play-image" src="images/brainlogoplay_text.png">
+          <!-- <button class="play-button">Play game!</button> -->
+      </div>
+      
+      <div class="footer-main-grid-panel">
+        <p class="footer-item stat">Beat the highest winning score: <span class="stat-value" id="top-score">0</span></p>
+        <p class="footer-item stat">Personal best: <span class="stat-value" id="personal-best">0</span></p>
+        <p class="footer-item stat">Improved <span class="stat-value" id="brains-improved">0</span> brains</p>
+      </div>
+    </div>
+  </main> 
 </body>
+<script src="javascripts/config.js"></script>
+<script src="javascripts/messages.js"></script>
+<script src="javascripts/functions.js"></script>
+<script src="javascripts/onLoad.js"></script>
 </html>

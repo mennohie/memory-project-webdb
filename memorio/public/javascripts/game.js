@@ -1,71 +1,28 @@
-
-
-
-
-function Game(id, socket) {
-    this.id = id;
-    this.winner = null;
-
-    this.playerType = null;
-    this.turns = [];
-
-    this.readyA = false;
-    this.readyB = false;
-
-
+// eslint-disable-next-line no-unused-vars
+class Game {
+  constructor (id, socket) {
+    this.id = id
+    this.winner = null
+    this.playerType = null
+    this.turns = []
+    this.scoreA = 0
+    this.scoreB = 0
     this.currentPlayer = null
-    this.timer = new Timer(2);
-
 
     this.setCardGrid = function (cardGrid) {
-        this.cardGrid = cardGrid;
+      this.cardGrid = cardGrid
     }
 
     this.setPlayerA = function (player) {
-        this.playerA = player;
+      this.playerA = player
     }
 
     this.setPlayerB = function (player) {
-        this.playerB = player;
+      this.playerB = player
     }
 
-    this.doTurn = function() {
-
-        // start timer with n secs
-        this.timer.start();
-
-        this.cardGrid.setActivePlayer(this.currentPlayer == playerA)
-
-        if(this.currentPlayer == playerA){
-            this.currentPlayer = playerB
-        }
-        else if(this.currentPlayer == playerB){
-            this.currentPlayer = playerA
-        }
-    };
-
-    this.start = function () {
-        this.currentPlayer = playerA;
-        window.requestAnimationFrame(() => {this.loop();})
+    this.setBoardState = function (boardState) {
+      this.cardGrid.setState(boardState.cardGrid.cards)
     }
-
-    this.loop = function () {
-        this.cardGrid.reset();
-        let currentPlayerElement = document.getElementById('current-player')
-        currentPlayerElement.innerText = "current player: " + this.currentPlayer.name;
-        if(this.readyA){
-          document.getElementById('ready-a').innerHTML = "Player A is ready!";
-        }
-        if(this.readyB){
-          document.getElementById('ready-b').innerHTML = "Player B is ready!";
-        }
-        this.doTurn();
-        setTimeout(() => {
-              window.requestAnimationFrame(
-                () => {this.loop();}
-            );
-        }, 2000);
-
-    }
-
   }
+}

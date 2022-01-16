@@ -1,149 +1,169 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 
 const ROTATE_CLASS_NAME = 'rotate'
-const BACKFACE_IMAGE = `images/brainlogo.png`
-const DELAY_IN_MS = 300;
+const BACKFACE_IMAGE = 'images/brainlogo.png'
+const DELAY_TIME_CARD_RESET = 1000
 
-function frontfaceImage(id) {
-    return `images/${id}.png`
+function frontfaceImage (id) {
+  return `images/${id}.png`
 }
 
-function Card(id, image, text, matchId) {
-    this.id = id;
-    this.matchId = matchId;
-    this.text = text;
-    this.image = image;
-    this.isMatched = false;
-    this.isTurned = false;
+function Card (id) {
+  this.id = id
+  this.isMatched = false
+  this.isTurned = false
+  this.text = null
+  this.image = null
 
-    this.element = document.createElement('div');
-    this.element.id = id;
+  this.element = document.createElement('div')
+  this.element.id = id
 
-    // this.element.onclick = function() {
-    //     this.turnOver();
-    // }.bind(this)
+  this.imgElement = document.createElement('img')
+  this.imgElement.setAttribute('width', '100%')
+  this.imgElement.src = BACKFACE_IMAGE
 
-    this.imgElement = document.createElement('img');
-    this.imgElement.setAttribute('width', '100%');
-    this.imgElement.src = BACKFACE_IMAGE;
+  this.textElement = document.createElement('div')
+  this.textElement.classList.add('text-card')
 
-    this.turnOver = function () {
-        if ( !this.isTurned ){
-            this.element.classList.add(ROTATE_CLASS_NAME)
-            this.imgElement.src = frontfaceImage(this.image);
-        }
-        else {
-            if(!this.isMatched) {
-                this.element.classList.remove(ROTATE_CLASS_NAME)
-                this.imgElement.src = BACKFACE_IMAGE;
-            }
-        }
-        this.isTurned = !this.isTurned
-        return this.matchId;
+  this.element.classList.add('card')
+  this.element.appendChild(this.imgElement)
+  this.element.appendChild(this.textElement)
+
+  this.turnOver = function (image, text) {
+    if (!this.isMatched) {
+      if (!this.isTurned && image != null && text != null) {
+        // turn front
+        this.element.classList.add(ROTATE_CLASS_NAME)
+        this.imgElement.src = frontfaceImage(image)
+        this.textElement.innerHTML = text
+      } else {
+        // turn back
+        this.element.classList.remove(ROTATE_CLASS_NAME)
+        this.imgElement.src = BACKFACE_IMAGE
+        this.textElement.innerHTML = ''
+      }
+      this.isTurned = !this.isTurned
+      const cardFlipSound = document.getElementById('card-flip-sound')
+      cardFlipSound.pause()
+      cardFlipSound.currentTime = 0
+      cardFlipSound.play()
+      return this.isTurned
+    } else {
+      this.element.classList.add(ROTATE_CLASS_NAME)
+      this.imgElement.src = frontfaceImage(this.image)
+      this.textElement.innerHTML = text
     }
-    
+    return this.isMatched
+  }
 
-
-    // creates an element of form
-    // 
-    // <div class="grid-item">
-    //     <img src="images/3.png" width="100%" />
-    // </div>
-    this.render = function() {
-        this.element.classList.add('card');        
-        this.element.appendChild(this.imgElement);
-        return this.element
+  this.reset = function () {
+    this.isTurned = false
+    if (this.isMatched) {
+      this.element.classList.add(ROTATE_CLASS_NAME)
+      this.imgElement.src = frontfaceImage(this.image)
+    } else {
+      // turn back
+      // add client side delay to turn the cards back, but allow the server to continue the game
+      setTimeout(() => {
+        this.element.classList.remove(ROTATE_CLASS_NAME)
+        this.imgElement.src = BACKFACE_IMAGE
+        this.textElement.innerHTML = ''
+      }, DELAY_TIME_CARD_RESET)
     }
+  }
 
-    this.getId = function() {
-        return this.id;
-    }
-
-
+  this.getElement = function () {
+    return this.element
+  }
 }
 
-function createCards(cardData) {
-    let cards = [];
-    cardData.forEach(element => {
-        cards.push(
-            new Card(element.id, element.image, element.text, element.matchId)
-        );
-    });
-    return cards;
+function createCards (cardData) {
+  const cards = []
+  cardData.forEach(element => {
+    cards.push(
+      new Card(element.id)
+    )
+  })
+  return cards
 }
 
-
-function cardGrid(cards) {
+class CardGrid {
+  constructor (cards, socket) {
     this.cards = cards
     this.cardGridElement = document.getElementById('card-grid')
-    this.toMatchId = null;
     this.turnedCards = []
-    this.isActivePlayer = false;
+    this.isActivePlayer = false
 
-    this.cards.forEach(element => {
-        this.cardGridElement.appendChild(
-            element.render() 
-        );
-    });
+    this.cards.forEach(card => {
+      this.cardGridElement.appendChild(
+        card.getElement()
+      )
+    })
 
     this.setActivePlayer = function (isActive) {
-        this.isActivePlayer = isActive;
+      this.isActivePlayer = isActive
     }
 
-    this.reset = function() {
-        this.cards.forEach(element => {
-            if(!element.isMatched && element.isTurned) {
-                element.turnOver();
-            }
-        });
+    this.reset = function () {
+      this.cards.forEach(element => {
+        element.reset()
+      })
     }
 
-    this.cardGridElement.onclick = function(e) {
-        if (this.isActivePlayer) {
-            cardId = e.target.parentElement.id
-            this.cards.every(element => {
-                if(element.getId() === cardId) {
-                    element.turnOver();
-                    return false;
-                }
-                return true;
-            });
-            this.getTurnedCards();
+    this.turnOverCard = function (cardId, image, text) {
+      this.cards.every(element => {
+        if (element.id === cardId) {
+          element.turnOver(image, text)
+          return false
         }
+        return true
+      })
+    }
+
+    this.cardGridElement.onclick = function (e) {
+      if (this.isActivePlayer) {
+        // find the card by id in the cards array and turn it over
+        const cardId = e.target.parentElement.id
+        this.cards.every(element => {
+          if (element.id === cardId) {
+            const msg = Messages.O_CARD_TURNED
+            msg.data = { cardId: cardId }
+            socket.send(JSON.stringify(msg))
+
+            return false
+          }
+          return true
+        })
+      }
     }.bind(this)
 
-
-    this.getTurnedCards = function() {
-        this.turnedCards = []
-        this.cards.forEach(element => {
-            if(element.isTurned) {
-                this.turnedCards.push(element)
+    this.setState = function (cards) {
+      cards.forEach(c => {
+        if (c.isMatched) {
+          this.cards.forEach(card => {
+            if (card.id === c.id) {
+              card.isMatched = c.isMatched
+              card.text = c.text
+              card.image = c.image
             }
-        });
-        if (this.turnedCards.length === 2) {
-            setTimeout(() => {
-                this.checkTurnedCards()
-              }, DELAY_IN_MS)
+          })
         }
+      })
     }
 
-    this.checkTurnedCards = function() {
-        const isMatch = this.turnedCards[0].matchId === this.turnedCards[1].matchId;
-        if (isMatch) {
-            console.log("mathc!")
-            this.turnedCards.forEach(element => {
-                element.isMatched = true;
-                element.turnOver();
-            })
-            return true;
+    this.matchCards = function (turnedCards) {
+      turnedCards.forEach(c => {
+        if (c.isMatched) {
+          this.cards.forEach(card => {
+            if (card.id === c.id) {
+              card.isMatched = c.isMatched
+              card.text = c.text
+              card.image = c.image
+            }
+          })
         }
-        else {
-            console.log("no mathc!")
-
-            this.turnedCards.forEach(element => {
-                element.turnOver();
-            })
-            return false;
-        }
+      })
     }
-
+  }
 }
