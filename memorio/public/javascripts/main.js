@@ -59,9 +59,6 @@
 
       document.getElementById('player-turn').innerHTML = 'Your turn'
       game.cardGrid.setActivePlayer(true)
-
-      timer.set(5000)
-      timer.start()
     }
 
     if (incomingMsg.type === Messages.T_TIMER_RUN_OUT || incomingMsg.type === Messages.T_BAD_MOVE) {
@@ -74,14 +71,17 @@
 
       document.getElementById('player-turn').innerHTML = 'Other Player turn'
       game.cardGrid.setActivePlayer(false)
-      timer.stop()
-      timer.set(5000)
-      timer.start()
 
       const incorrectSound = document.getElementById('incorrect-sound')
       incorrectSound.pause()
       incorrectSound.currentTime = 0
       incorrectSound.play()
+    }
+
+    if (incomingMsg.type === Messages.T_SET_TIMER) {
+      timer.stop();
+      timer.set(5000);
+      timer.start();
     }
 
     if (incomingMsg.type === Messages.T_CARD_MATCH) {
@@ -126,7 +126,9 @@
 
       document.getElementById('server-info').innerHTML = `Game won by: ${incomingMsg.data}. Congratulations!`
       // TODO: add something like this:
-      // game.timer.stop();
+      timer.set(0);
+      timer.stop();
+      document.getElementById('timer').innerHTML = "Finished!";
     }
 
     if (incomingMsg.type === Messages.T_FOUND_GAME) {
