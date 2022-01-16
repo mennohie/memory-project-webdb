@@ -75,6 +75,15 @@
   }
 
   /*
+   * Server to Player A & B: set timer for both players
+   */
+  exports.T_SET_TIMER = 'SET-TIMER'
+  exports.O_SET_TIMER = {
+    type: exports.T_SET_TIMER,
+    data: null
+  }
+
+  /*
    * Player A | B to Server: Which card has been turned around
    */
   exports.T_CARD_TURNED = 'CARD-TURNED'
